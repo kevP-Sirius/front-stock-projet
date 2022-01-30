@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import { Routes,Route } from "react-router-dom"
+import { useEffect } from 'react';
+import SigninContainer from "./container/signinContainer";
+import SignupContainer from "./container/signupContainer";
+import HomepageContainer from "./container/homepageContainer";
+import ProductsContainer from "./container/productsContainer";
+import UsersContainer from "./container/usersContainer";
+import ClientsContainer from "./container/clientsContainer";
+import OperationsContainer from "./container/operationContainer";
+import CartsContainer from "./container/cartContainer";
+const App = ({firststate,firstAction,role,connect}) => {
 
-function App() {
+  
+  useEffect(()=>{
+    if(localStorage.getItem("user")!==null){
+      const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
+      console.log(userInfo) 
+      connect(userInfo)
+    }
+  },[])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <>
+    <div className="container  p-3">
+        <div className="row">
+            <Routes>
+                <Route path="/" element={<HomepageContainer />} />
+                <Route path="/signin" element={<SigninContainer />} />
+                <Route path="/signup" element={<SignupContainer />} />
+                <Route path="/products" element={<ProductsContainer />} />
+                <Route path="/clients" element={<ClientsContainer />} />
+                <Route path="/operations" element={<OperationsContainer />} />
+                <Route path="/command" element={<CartsContainer />} />
+                <Route path="/users" element={<UsersContainer />} />
+            </Routes>
+        </div>
     </div>
-  );
+    </>
+  )
 }
 
 export default App;

@@ -1,0 +1,39 @@
+{
+  "product": [
+    {
+      "name": "entrecote frite",
+      "price": 19,
+      "stock": "15",
+      "picture": "https://img.cuisineaz.com/660x660/2019/07/31/i149582-entrecote-frites.webp",
+      "id": 1
+    },
+    {
+      "id": 2,
+      "name": "spaghetti bolognaise",
+      "price": 8,
+      "stock": 40,
+      "picture": "https://www.ensauce.com/wp-content/uploads/2015/10/spaghetti-bolognaise-250x250.jpg"
+    },
+    {
+      "id": 3,
+      "name": "pizza",
+      "price": 12,
+      "stock": 0,
+      "picture": "https://img.cuisineaz.com/660x660/2018/03/19/i137572-pizza-rapide-et-facile-au-jambon-tomates-fromage-olives.webp"
+    },
+    {
+      "name": "homar frite",
+      "price": "45",
+      "stock": "10",
+      "picture": "https://img.lemde.fr/2016/12/21/0/0/1920/1280/664/0/75/0/73c8200_2016122445.0.1865709240homard2_web.jpg",
+      "id": 4
+    },
+    {
+      "name": "boeuf de kobé",
+      "price": "300",
+      "stock": "80",
+      "picture": "https://www.maison-lascours.fr/Files/123193/Img/02/boeuf-de-kobe-big.jpg",
+      "id": 5
+    }
+  ]
+}
