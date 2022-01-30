@@ -2,6 +2,10 @@ import { useState,useEffect } from "react";
 
 let Signup =({updateErrorMessage,messageError,signup,messageStatus})=>{
     let [forms , setForms] = useState({login:'',password:'',email:'',role:'admin'})
+    let env="prod"
+    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlLocal = "http://localhost:9001"
+    let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let handleChange = (event)=>{
     let  {name,value} = event.target
     setForms({...forms,[name]:value});

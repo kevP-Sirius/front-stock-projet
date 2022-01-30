@@ -12,9 +12,12 @@ let Users = ({role,connect})=>{
     let [idToUpdate,setIdToUpdate] = useState(null)
     let [errorMsg,setErrorMsg]= useState("")
     let [users , setUsers ] =useState([])
-
+    let env="prod"
+    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlLocal = "http://localhost:9001"
+    let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let getUsers =()=>{
-        axios.get("http://localhost:9001/users/list").then((response)=>{
+        axios.get(`${baseUrlToUse}/users/list`).then((response)=>{
             console.log(response) 
             setUsers([...response.data])
         })
@@ -28,7 +31,7 @@ let Users = ({role,connect})=>{
         if(test){
             var currentDate = moment().format("DD-MM-YYYY");
             let data = qs.stringify({_id:idToUpdate,...forms,date_modification:currentDate})
-            axios.post("http://localhost:9001/users/edit",data).then((response)=>{
+            axios.post(`${baseUrlToUse}/users/edit`,data).then((response)=>{
                 setMode("add")
                 resetInput()
                 setErrorMsg(response.data.message)
@@ -54,7 +57,7 @@ let Users = ({role,connect})=>{
     let handleDeleteUser =(id)=>{
        
         let data = qs.stringify({id:id})
-        axios.post("http://localhost:9001/users/delete",data).then((response)=>{
+        axios.post(`${baseUrlToUse}/users/delete`,data).then((response)=>{
             console.log(response)
             setErrorMsg(response.data.message)
             getUsers()
@@ -108,7 +111,7 @@ let Users = ({role,connect})=>{
             }
         }
         let data = qs.stringify(forms)
-        axios.post("http://localhost:9001/users/add",data).then((response)=>{
+        axios.post(`${baseUrlToUse}/users/add`,data).then((response)=>{
             resetInput()
             setErrorMsg(response.data.message)
             getUsers()

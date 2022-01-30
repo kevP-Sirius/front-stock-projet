@@ -4,6 +4,10 @@ import {
 const axios = require('axios');
 const qs = require('qs');
 let base_url="http://localhost:9001"
+let env="prod"
+    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlLocal = "http://localhost:9001"
+    let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
 const Middleware = (store) => (next) => (action) => {
   next(action);
   switch (action.type) {
@@ -17,7 +21,7 @@ const Middleware = (store) => (next) => (action) => {
         password:action.data.password
       })
      
-      axios.post(`${base_url}/signin`,data).then(response=>{
+      axios.post(`${baseUrlToUse}/signin`,data).then(response=>{
         
         console.log(response)
         if(response.data.status==="200"){
@@ -41,7 +45,7 @@ const Middleware = (store) => (next) => (action) => {
         role:action.data.role,
         password:action.data.password
       })
-      axios.post(`${base_url}/signup`,data).then(response=>{
+      axios.post(`${baseUrlToUse}/signup`,data).then(response=>{
         console.log(response)
         store.dispatch(updateErrorMessage(response.data))
         
