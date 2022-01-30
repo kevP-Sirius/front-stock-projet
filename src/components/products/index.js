@@ -21,7 +21,7 @@ let Products = ({role,connect})=>{
         addDateModification()
         if(test){
             let data = qs.stringify({_id:idToUpdate,...forms})
-            axios.post("http://localhost:9001/products/edit",data).then((response)=>{
+            axios.post("http://3.145.43.146:9001/products/edit",data).then((response)=>{
                 setMode("add")
                 resetInput()
                 setErrorMsg(response.data.message)
@@ -45,7 +45,7 @@ let Products = ({role,connect})=>{
     let handleDeleteProduct =(id)=>{
        
         let data = qs.stringify({id:id})
-        axios.post("http://localhost:9001/products/delete",data).then((response)=>{
+        axios.post("http://3.145.43.146:9001/products/delete",data).then((response)=>{
             console.log(response)
             setErrorMsg(response.data.message)
             getProducts()
@@ -74,7 +74,7 @@ let Products = ({role,connect})=>{
             }
         }
         let data = qs.stringify(forms)
-        axios.post("http://localhost:9001/products/add",data).then((response)=>{
+        axios.post("http://3.145.43.146:9001/products/add",data).then((response)=>{
             setForm({designation:'',prix_achat:'',prix_vente:'',quantite_en_stock:'',date_modification:''})
             setErrorMsg(response.data.message)
             getProducts()
@@ -86,7 +86,7 @@ let Products = ({role,connect})=>{
         setForm({...forms,date_modification:currentDate})
     }
     let getProducts =()=>{
-        axios.get("http://localhost:9001/products").then((response)=>{
+        axios.get("http://3.145.43.146:9001/products").then((response)=>{
         console.log(response) 
         SetProducts([...response.data])
     }) 

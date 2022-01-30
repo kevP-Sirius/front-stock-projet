@@ -9,7 +9,7 @@ let Cart =({role,isConnected,connect})=>{
     let [products , SetProducts ] =useState([])
     let navigate = useNavigate();
     let getProducts =()=>{
-        axios.get("http://localhost:9001/products").then((response)=>{
+        axios.get("http://3.145.43.146:9001/products").then((response)=>{
             console.log(response) 
             SetProducts([...response.data])
         }) 

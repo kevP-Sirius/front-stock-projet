@@ -14,7 +14,7 @@ let Clients = ({role,connect})=>{
     let [clients , setClients ] =useState([])
 
     let getClients =()=>{
-        axios.get("http://localhost:9001/clients/list").then((response)=>{
+        axios.get("http://3.145.43.146:9001/clients/list").then((response)=>{
             console.log(response) 
             setClients([...response.data])
         })
@@ -27,7 +27,7 @@ let Clients = ({role,connect})=>{
         let test = await checkInput()
         if(test){
             let data = qs.stringify({_id:idToUpdate,...forms})
-            axios.post("http://localhost:9001/clients/edit",data).then((response)=>{
+            axios.post("http://3.145.43.146:9001/clients/edit",data).then((response)=>{
                 setMode("add")
                 resetInput()
                 setErrorMsg(response.data.message)
@@ -53,7 +53,7 @@ let Clients = ({role,connect})=>{
     let handleDeleteClients =(id)=>{
        
         let data = qs.stringify({id:id})
-        axios.post("http://localhost:9001/clients/delete",data).then((response)=>{
+        axios.post("http://3.145.43.146:9001/clients/delete",data).then((response)=>{
             console.log(response)
             setErrorMsg(response.data.message)
             getClients()
@@ -106,7 +106,7 @@ let Clients = ({role,connect})=>{
             }
         }
         let data = qs.stringify(forms)
-        axios.post("http://localhost:9001/clients/add",data).then((response)=>{
+        axios.post("http://3.145.43.146:9001/clients/add",data).then((response)=>{
             resetInput()
             setErrorMsg(response.data.message)
             getClients()

@@ -14,12 +14,12 @@ let Operations = ({role,connect})=>{
     let [errorMsg,setErrorMsg]= useState("")
     let [operations , setOperations ] =useState([])
     let getClients=()=>{
-        axios.get("http://localhost:9001/clients/list").then(response=>{
+        axios.get("http://3.145.43.146:9001/clients/list").then(response=>{
             setClients(response.data)
         })
     }
     let getOperations =()=>{
-        axios.get("http://localhost:9001/operations/list").then((response)=>{
+        axios.get("http://3.145.43.146:9001/operations/list").then((response)=>{
             console.log(response) 
             setOperations([...response.data])
         })
@@ -37,7 +37,7 @@ let Operations = ({role,connect})=>{
     let handleDeleteOperations=(id)=>{
         let data = qs.stringify({id:id})
  
-        axios.post("http://localhost:9001/operations/delete",data).then((response)=>{
+        axios.post("http://3.145.43.146:9001/operations/delete",data).then((response)=>{
             setErrorMsg(response.data.message)
             getOperations()
         }) 
@@ -59,7 +59,7 @@ let Operations = ({role,connect})=>{
         let clientToAdd = clients.filter(client=>client._id==forms.client)
         let data = qs.stringify({...forms,client:clientToAdd})
  
-        axios.post("http://localhost:9001/operations/add",data).then((response)=>{
+        axios.post("http://3.145.43.146:9001/operations/add",data).then((response)=>{
             resetForm()
             setErrorMsg(response.data.message)
             getOperations()
