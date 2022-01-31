@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import * as moment from 'moment';
 const qs = require('qs');
 
-let Products = ({role,connect})=>{
+let Products = ({role,connect,env})=>{
     let navigate = useNavigate();
     const [forms,setForm ] = useState({designation:'',prix_achat:'',prix_vente:'',quantite_en_stock:'',date_modification:''})
     const label = {designation:'designation',prix_achat:"prix d'achat",prix_vente:'prix de vente',quantite_en_stock:'quantité en stock',date_modification:'date de modification'}
@@ -12,7 +12,6 @@ let Products = ({role,connect})=>{
     let [idToUpdate,setIdToUpdate] = useState(null)
     let [errorMsg,setErrorMsg]= useState("")
     let [products , SetProducts ] =useState([])
-    let env="prod"
     let baseUrlProd = "http://3.145.43.146:9001"
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
