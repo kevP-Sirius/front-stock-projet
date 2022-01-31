@@ -14,6 +14,7 @@ import { login,updateErrorMessage,signup , connect as connecting} from '../store
  */
 const mapStateToProps = (state) => ({ 
   role:state.appReducer.role,
+  env:state.appReducer.env,
 });
 
 /* === Actions ===

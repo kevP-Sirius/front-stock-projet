@@ -1,15 +1,21 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import * as moment from 'moment';
 const qs = require('qs');
 
-let Commands =()=>{
+let Commands =({env})=>{
+    console.log(env)
+    const {state} = useLocation();
+    const { id } = state;
     let [operations , setOperations]=useState([])
     let [clients, setClients]=useState([])
     let navigate = useNavigate();
     const [forms,setForm ] = useState({_id:''})
     const label = {_id:'numero de commande'}
+    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlLocal = "http://localhost:9001"
+    let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let getCommands=()=>{
         
     }
@@ -18,7 +24,7 @@ let Commands =()=>{
         setForm({...forms,[name]:value});
     }
     let getClients=()=>{
-        axios.get("http://localhost:9001/clients/list").then(response=>{
+        axios.get(`${baseUrlToUse}/clients/list`).then(response=>{
             setClients(response.data)
         })
     }

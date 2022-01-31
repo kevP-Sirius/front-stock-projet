@@ -14,7 +14,8 @@ import { login,updateErrorMessage,signup , } from '../store/reducer/appReducer';
  */
 const mapStateToProps = (state) => ({ 
     messageError:state.appReducer.messageError,
-    messageStatus:state.appReducer.messageStatus
+    messageStatus:state.appReducer.messageStatus,
+    env:state.appReducer.env,
 });
 
 /* === Actions ===

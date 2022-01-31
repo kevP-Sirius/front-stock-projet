@@ -5,7 +5,8 @@ const initialState = {
     role:'',
     isConnected:false,
     messageError:'',
-    messageStatus:''
+    messageStatus:'',
+    env:'dev'
 
   };
   

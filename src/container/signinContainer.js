@@ -16,6 +16,7 @@ const mapStateToProps = (state) => ({
     messageError:state.appReducer.messageError,
     username: state.appReducer.username,
     messageStatus:state.appReducer.messageStatus,
+    env:state.appReducer.env,
 });
 
 /* === Actions ===

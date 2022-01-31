@@ -5,21 +5,24 @@ import * as moment from 'moment';
 import './operations.scss'
 const qs = require('qs');
 
-let Operations = ({role,connect})=>{
+let Operations = ({role,connect,env})=>{
     let navigate = useNavigate();
     let [forms,setForm ] = useState({client:'',payer_espece:"",payer_cheque:'',payer_credit:''})
     let [clients,setClients] =useState([])
     const label = {_id:'n° commande',product:'produit',client:'client',prix_ttc:"ttc",prix_vente:"prix de vente", date_operation:"date",date_modification:'modification',quantite:"quantite",payer_espece:"espèce",payer_cheque:'chèque',payer_credit:'carte'}
     let [mode,setMode ] = useState('add')
     let [errorMsg,setErrorMsg]= useState("")
-    let [operations , setOperations ] =useState([])
+    let [operations , setOperations ] =useState([]) 
+    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlLocal = "http://localhost:9001"
+    let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let getClients=()=>{
-        axios.get("http://3.145.43.146:9001/clients/list").then(response=>{
+        axios.get(`${baseUrlToUse}/clients/list`).then(response=>{
             setClients(response.data)
         })
     }
     let getOperations =()=>{
-        axios.get("http://3.145.43.146:9001/operations/list").then((response)=>{
+        axios.get(`${baseUrlToUse}/operations/list`).then((response)=>{
             console.log(response) 
             setOperations([...response.data])
         })
@@ -31,13 +34,13 @@ let Operations = ({role,connect})=>{
         let {name,value} = event.target
         setForm({...forms,[name]:value});
     }
-    let handleUpdate=()=>{
-
+    let handlePanier=(id)=>{
+        navigate(`/command`,{state:{id:id}})
     }
     let handleDeleteOperations=(id)=>{
         let data = qs.stringify({id:id})
  
-        axios.post("http://3.145.43.146:9001/operations/delete",data).then((response)=>{
+        axios.post(`${baseUrlToUse}/operations/delete`,data).then((response)=>{
             setErrorMsg(response.data.message)
             getOperations()
         }) 
@@ -59,7 +62,7 @@ let Operations = ({role,connect})=>{
         let clientToAdd = clients.filter(client=>client._id==forms.client)
         let data = qs.stringify({...forms,client:clientToAdd})
  
-        axios.post("http://3.145.43.146:9001/operations/add",data).then((response)=>{
+        axios.post(`${baseUrlToUse}/operations/add`,data).then((response)=>{
             resetForm()
             setErrorMsg(response.data.message)
             getOperations()
@@ -175,7 +178,7 @@ return(
                                 <td>{operations.payer_credit}</td>
                                 <td>{operations.date_operation}</td>
                                 <td>{operations.date_modification}</td>
-                                <td>{(role=="admin"||role=="livreur") && <><button onClick={()=>{handleUpdate(operations._id)}} className="btn btn-warning" >Modifier</button></>}</td>
+                                <td>{(role=="admin"||role=="livreur") && <><button onClick={()=>{handlePanier(operations._id)}} className="btn btn-warning" >Panier</button></>}</td>
                                 <td>{role=="admin"&& <><button onClick={()=>{handleDeleteOperations(operations._id)}} className="btn btn-danger" >Supprimer</button></>}</td>
                             </tr>
                         )

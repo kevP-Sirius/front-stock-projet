@@ -16,6 +16,7 @@ const mapStateToProps = (state) => ({
   isConnected: state.appReducer.isConnected,
   username : state.appReducer.username,
   role : state.appReducer.role,
+  env:state.appReducer.env,
 });
 
 /* === Actions ===

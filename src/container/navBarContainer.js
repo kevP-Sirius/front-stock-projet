@@ -15,7 +15,8 @@ import { firstAction,disconnect } from '../store/reducer/appReducer';
 const mapStateToProps = (state) => ({ 
   isConnected: state.appReducer.isConnected,
   role: state.appReducer.role,
-  username: state.appReducer.username
+  username: state.appReducer.username,
+  env:state.appReducer.env,
 
 });
 
