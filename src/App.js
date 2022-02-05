@@ -22,7 +22,7 @@ const App = ({firststate,firstAction,role,connect}) => {
   return (
     <>
     <div className="container  p-3">
-        <div className="row">
+        
             <Routes>
                 <Route path="/" element={<HomepageContainer />} />
                 <Route path="/signin" element={<SigninContainer />} />
@@ -33,7 +33,7 @@ const App = ({firststate,firstAction,role,connect}) => {
                 <Route path="/command" element={<CartsContainer />} />
                 <Route path="/users" element={<UsersContainer />} />
             </Routes>
-        </div>
+       
     </div>
     </>
   )

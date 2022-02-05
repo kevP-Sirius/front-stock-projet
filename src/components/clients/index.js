@@ -149,6 +149,7 @@ return(
                 <button type="button" onClick={handleCancelEdit} className="mt-3 btn btn-info">Annuler modification</button>
             </div>}
         </form>
+        <div className=" table-responsive width-tab-responsive" >
             <table className="table text-center ">
                 <thead className=" bg-warning">
                     <tr>
@@ -192,6 +193,7 @@ return(
                     })}
                 </tbody>
             </table>
+            </div>
         </>
 
     )

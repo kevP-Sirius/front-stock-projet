@@ -117,7 +117,7 @@ let Products = ({role,connect,env})=>{
     
     return(
         <>
-            <form onSubmit={handleSubmit} className="mb-3">
+            <form onSubmit={handleSubmit} className="mb-3 ">
                 <div className="form-group">
                     <label htmlFor="titre">{label.designation}</label>
                     <input type="text" onChange={handleChange} value={forms.designation} className="form-control" id="designation" name="designation" aria-describedby="designation"  />
@@ -150,6 +150,7 @@ let Products = ({role,connect,env})=>{
                 
 
             </form>
+            <div className=" table-responsive width-tab-responsive" >
             <table className="table text-center ">
                 <thead className=" bg-warning">
                     <tr>
@@ -189,6 +190,7 @@ let Products = ({role,connect,env})=>{
                     })}
                 </tbody>
             </table>
+            </div>
         </>
     )
     }

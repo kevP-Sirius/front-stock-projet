@@ -150,8 +150,8 @@ let Cart =({role,isConnected,connect,env})=>{
     return (
         <>
         <div className="d-flex justify-content-center mb-3"><p>numéro de commande : {id} </p></div>
-            <div className="container d-flex justify-content-around">
-                <div className="col-8">
+            <div className="container d-flex flex-column-reverse flex-lg-row justify-content-around">
+                <div className="col-8 m-3">
                     {products.map((product,index)=>{
                         return(
                                 <div className="card cardStyle"  key={product._id,index}>
@@ -169,7 +169,7 @@ let Cart =({role,isConnected,connect,env})=>{
                 </div>
                 <>  
                     <div className="">
-                    <div className="panierTab">
+                    <div className="panierTab" style={{'max-width':'fit-content'}}>
                     <div className="card-body">
                         <h5 className="card-title">Mon panier</h5>
                         <p className="card-text">Nombres d'articles : {command.quantite} </p>
