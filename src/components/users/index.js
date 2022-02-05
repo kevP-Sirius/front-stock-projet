@@ -154,6 +154,7 @@ return(
                 
 
             </form>
+            <div className=" table-responsive width-tab-responsive" >
             <table className="table text-center ">
                 <thead className=" bg-warning">
                     <tr>
@@ -193,6 +194,7 @@ return(
                     })}
                 </tbody>
             </table>
+            </div>
         </>
 
     )
