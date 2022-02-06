@@ -48,7 +48,8 @@ let FormCart  =({role,isConnected,connect,env})=>{
         }) 
     }
     let getOperations =()=>{
-        axios.get(`${baseUrlToUse}/command/${id}`).then((response)=>{ 
+        axios.get(`${baseUrlToUse}/command/${id}`).then((response)=>{
+            
             setOperations(response.data[0])
             SetPanier(response.data[0].produit)
             let newTotal = 0
@@ -69,7 +70,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
         let data = qs.stringify({_id:newProduct._id})
         
         axios.post(`${baseUrlToUse}/article/checkstock`,data).then((reponse)=>{
-            console.log(reponse.data.status)
+            
            
             if(reponse.data.status==200){
                 if(searchIndex!==-1){
@@ -81,9 +82,14 @@ let FormCart  =({role,isConnected,connect,env})=>{
                     quantiteToDown = parseInt(forms.quantite)
                     newProduitList[searchIndex]=productToAdd
                     let newQuantiteTotal=parseInt(operations.quantite)+parseInt(forms.quantite)
-                    let newPrixTtc = parseInt(operations.prix_ttc)+parseInt(productToAdd.prix_vente)
+                    let newPrixTtc = 0
                     let newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:parseInt(forms.quantite),action:"add"}}
-                    console.log(newPanier.productToDownStock)
+                    newPanier.panierToUpdate.produit.map(product=>{
+                        newQuantiteTotal+=parseInt(product.quantite);
+                        newPrixTtc+=parseInt(product.quantite*product.prix_vente)
+                    })
+                    newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
+                    
                     let updateData = qs.stringify(newPanier)
                     axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                         getProducts()
@@ -94,10 +100,15 @@ let FormCart  =({role,isConnected,connect,env})=>{
                 }else{
                     let newQuantite = parseInt(operations.quantite)+parseInt(forms.quantite)
                     let productToAdd = {_id:newProduct._id,designation:newProduct.designation,prix_vente:newProduct.prix_vente,quantite:forms.quantite}
-                    let newPrixTtc = parseInt(operations.prix_ttc)+parseInt(productToAdd.prix_vente)
+                    let newQuantiteTotal = 0 
+                    let newPrixTtc = 0
                     let quantiteToDown = parseInt(forms.quantite)
                     let newPanier = {panierToUpdate:{...operations,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
-                    console.log(newPanier.productToDownStock)
+                    newPanier.panierToUpdate.produit.map(product=>{
+                        newQuantiteTotal+=parseInt(product.quantite);
+                        newPrixTtc+=parseInt(product.quantite*product.prix_vente)
+                    })
+                    newPanier = {panierToUpdate:{...operations,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
                     let updateData = qs.stringify(newPanier)
                     axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                         getProducts()
@@ -140,7 +151,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
     let deleteArticle =(articleToDelete)=>{
         let newProduit = operations.produit.filter(item=>item._id!==articleToDelete._id);
         let searchIndex = operations.produit.findIndex(item=>item._id==articleToDelete._id)
-        console.log(newProduit)
+        
         if(searchIndex!==-1){
             
             let newProduitList = [...operations.produit]
@@ -166,7 +177,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
     }
     let handleSubmit =(event)=>{
         event.preventDefault()
-        console.log(parseInt(forms.quantite))
+        
         if(parseInt(forms.quantite)==0||isNaN(parseInt(forms.quantite))){
             return  setErrorMsg("Veuillez saisir une quantite supérieur à 0")
             
@@ -197,7 +208,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                 break;
             case 'quantite':
                 let selectedProduct = products.filter(product=>product._id==forms.designation)
-                console.log(forms.designation)
+                
                 let quantiteMax = 0
                
                 if(mode=="add"){
@@ -212,7 +223,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                     }
                 }else{
                     let productPanierQte = panier.filter(item=>item._id==forms.designation)[0].quantite
-                    console.log(productPanierQte)
+                   
                     if(parseInt(productPanierQte)>0){
                         quantiteMax = parseInt(productPanierQte)+parseInt(selectedProduct[0].quantite_en_stock)
                     }else{
@@ -238,10 +249,10 @@ let FormCart  =({role,isConnected,connect,env})=>{
     let handleEdit =(id)=>{
         setMode("edit")
         let productToEdit = products.filter(product=>product._id==id);
-        console.log(productToEdit,products,id)
+        
         let itemId = productToEdit[0]._id
         let designation = productToEdit[0].designation
-        console.log(designation)
+        
         let prix_vente = productToEdit[0].prix_vente
         let quantite_en_stock = productToEdit[0].quantite_en_stock
         setElementToUpdate({_id:itemId,designation:designation,prix_vente:prix_vente,quantite_en_stock:quantite_en_stock})
