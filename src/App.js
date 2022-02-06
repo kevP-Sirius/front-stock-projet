@@ -8,6 +8,7 @@ import UsersContainer from "./container/usersContainer";
 import ClientsContainer from "./container/clientsContainer";
 import OperationsContainer from "./container/operationContainer";
 import CartsContainer from "./container/cartContainer";
+import FormCartContainer from "./container/FormCartContainer";
 const App = ({firststate,firstAction,role,connect}) => {
 
   
@@ -31,6 +32,7 @@ const App = ({firststate,firstAction,role,connect}) => {
                 <Route path="/clients" element={<ClientsContainer />} />
                 <Route path="/operations" element={<OperationsContainer />} />
                 <Route path="/command" element={<CartsContainer />} />
+                <Route path="/formcart" element={<FormCartContainer />} />
                 <Route path="/users" element={<UsersContainer />} />
             </Routes>
        

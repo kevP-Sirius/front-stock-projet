@@ -6,7 +6,7 @@ const initialState = {
     isConnected:false,
     messageError:'',
     messageStatus:'',
-    env:'prod'
+    env:'dev'
 
   };
   

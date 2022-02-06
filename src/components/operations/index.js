@@ -35,7 +35,7 @@ let Operations = ({role,connect,env})=>{
         setForm({...forms,[name]:value});
     }
     let handlePanier=(id)=>{
-        navigate(`/command`,{state:{id:id}})
+        navigate(`/formcart`,{state:{id:id}})
     }
     let handleDeleteOperations=(id)=>{
         let data = qs.stringify({id:id})
