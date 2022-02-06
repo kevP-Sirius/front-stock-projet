@@ -82,8 +82,8 @@ let FormCart  =({role,isConnected,connect,env})=>{
                     newProduitList[searchIndex]=productToAdd
                     let newQuantiteTotal=parseInt(operations.quantite)+parseInt(forms.quantite)
                     let newPrixTtc = parseInt(operations.prix_ttc)+parseInt(productToAdd.prix_vente)
-                    let newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:parseInt(forms.quantite)}}
-                    console.log(newPanier)
+                    let newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:parseInt(forms.quantite),action:"add"}}
+                    console.log(newPanier.productToDownStock)
                     let updateData = qs.stringify(newPanier)
                     axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                         getProducts()
@@ -97,6 +97,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                     let newPrixTtc = parseInt(operations.prix_ttc)+parseInt(productToAdd.prix_vente)
                     let quantiteToDown = parseInt(forms.quantite)
                     let newPanier = {panierToUpdate:{...operations,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
+                    console.log(newPanier.productToDownStock)
                     let updateData = qs.stringify(newPanier)
                     axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                         getProducts()
