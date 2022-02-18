@@ -78,7 +78,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                     let productToAdd = {_id:newProduct._id,designation:newProduct.designation,prix_vente:newProduct.prix_vente,quantite:newQuantite}
                     let newProduitList = [...operations.produit]
                     let oldQte =  parseInt(newProduitList[searchIndex].quantite);
-                    let quantiteToDown = 0
+                    let quantiteToDown = 0;
                     quantiteToDown = parseInt(forms.quantite)
                     newProduitList[searchIndex]=productToAdd
                     let newQuantiteTotal=parseInt(operations.quantite)+parseInt(forms.quantite)
@@ -88,7 +88,8 @@ let FormCart  =({role,isConnected,connect,env})=>{
                         newQuantiteTotal+=parseInt(product.quantite);
                         newPrixTtc+=parseInt(product.quantite*product.prix_vente)
                     })
-                    newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
+                    let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
+                    newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
                     
                     let updateData = qs.stringify(newPanier)
                     axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
@@ -108,7 +109,8 @@ let FormCart  =({role,isConnected,connect,env})=>{
                         newQuantiteTotal+=parseInt(product.quantite);
                         newPrixTtc+=parseInt(product.quantite*product.prix_vente)
                     })
-                    newPanier = {panierToUpdate:{...operations,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
+                    let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
+                    newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
                     let updateData = qs.stringify(newPanier)
                     axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                         getProducts()
@@ -137,7 +139,8 @@ let FormCart  =({role,isConnected,connect,env})=>{
                 newQuantiteTotal+=parseInt(product.quantite);
                 newPrixTtc+=parseInt(product.quantite*product.prix_vente)
             })
-            newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'edit'}}
+            let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
+            newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'edit'}}
             let updateData = qs.stringify(newPanier)
             axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                 setMode('add')
@@ -164,7 +167,8 @@ let FormCart  =({role,isConnected,connect,env})=>{
                 newQuantiteTotal+=parseInt(product.quantite);
                 newPrixTtc+=parseInt(product.quantite*product.prix_vente)
             })
-            newPanier = {panierToUpdate:{...operations,produit:[...newProduit],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:articleToDelete._id,quantiteToDown:quantiteToDown,action:'delete'}}
+            let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
+            newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduit],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:articleToDelete._id,quantiteToDown:quantiteToDown,action:'delete'}}
             let updateData = qs.stringify(newPanier)
             axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                 getProducts()
@@ -272,9 +276,9 @@ let FormCart  =({role,isConnected,connect,env})=>{
                {mode=="add" && <div className="form-group">
                     <label htmlFor="Pays">{label.designation}</label>
                     <select  onChange={handleChange} value={forms.designation} className="form-control" id="designation" name="designation" aria-describedby="designation" >
-                    <option value="">Selectionnez un article</option>
+                    <option key={0} value="">Selectionnez un article</option>
                     {optionList.map(data=>{
-                      return  <option value={data._id} >{data.designation} , prix de vente : {data.prix_vente} euros, stock : {data.quantite_en_stock}</option>
+                      return  <option key={data._id} value={data._id} >{data.designation} , prix de vente : {data.prix_vente} euros, stock : {data.quantite_en_stock}</option>
                     })}
                     </ select>
                 </div>
@@ -283,7 +287,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                     <label htmlFor="Pays">{label.designation}</label>
                     <select  onChange={handleChange} value={forms.designation} className="form-control" id="designation" name="designation" aria-describedby="designation" >
                     {
-                      <option value={elementToUpdate._id} >{elementToUpdate.designation} , prix de vente : {elementToUpdate.prix_vente} euros, stock : {elementToUpdate.quantite_en_stock}</option>
+                      <option key={0} value={elementToUpdate._id} >{elementToUpdate.designation} , prix de vente : {elementToUpdate.prix_vente} euros, stock : {elementToUpdate.quantite_en_stock}</option>
                     }
                     </ select>
                 </div>

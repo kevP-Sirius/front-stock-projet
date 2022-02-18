@@ -135,10 +135,10 @@ return(
                 <div className="form-group">
                     <label htmlFor="Année">{label.role}</label>
                     <select type="number"  onChange={handleChange} value={forms.role} className="form-control" id="role" name="role" aria-describedby="role">
-                    <option value="">Selectionnez un role</option>
-                        <option value="admin">admin</option>
-                        <option value="comptable">comptable</option>
-                        <option value="livreur">livreur</option>
+                    <option key={0} value="">Selectionnez un role</option>
+                        <option  key={1} value="admin">admin</option>
+                        <option  key={2} value="comptable">comptable</option>
+                        <option  key={3} value="livreur">livreur</option>
                     </select>    
                 </div>
                

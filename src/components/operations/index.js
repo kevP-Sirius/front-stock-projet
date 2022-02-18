@@ -9,13 +9,14 @@ let Operations = ({role,connect,env})=>{
     let navigate = useNavigate();
     let [forms,setForm ] = useState({client:'',payer_espece:"",payer_cheque:'',payer_credit:''})
     let [clients,setClients] =useState([])
-    const label = {_id:'n° commande',product:'produit',client:'client',prix_ttc:"ttc",prix_vente:"prix de vente", date_operation:"date",date_modification:'modification',quantite:"quantite",payer_espece:"espèce",payer_cheque:'chèque',payer_credit:'carte'}
+    const label = {_id:'n° commande',product:'produit',client:'client',prix_ttc:"ttc",prix_vente:"prix de vente", date_operation:"date",date_modification:'modification',quantite:"quantite",payer_espece:"espèce",payer_cheque:'chèque',payer_credit:'montant à régler'}
     let [mode,setMode ] = useState('add')
     let [errorMsg,setErrorMsg]= useState("")
     let [operations , setOperations ] =useState([]) 
     let baseUrlProd = "http://3.145.43.146:9001"
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
+    let [idToEdit,setIdToEdit] = useState(0)
     let getClients=()=>{
         axios.get(`${baseUrlToUse}/clients/list`).then(response=>{
             setClients(response.data)
@@ -45,11 +46,36 @@ let Operations = ({role,connect,env})=>{
             getOperations()
         }) 
     }
-    let handleEdit = async()=>{
-
+    let handleEdit = (id)=>{
+        setMode("edit")
+        let OperationToEdit = operations.filter(op=>op._id==id);
+        setIdToEdit(id);
+        setForm({
+            client:OperationToEdit[0].client[0]._id,
+            payer_espece:OperationToEdit[0].payer_espece,
+            payer_cheque:OperationToEdit[0].payer_cheque,
+            payer_credit:OperationToEdit[0].payer_credit
+        })
+        
     }
     let handleCancelEdit = () =>{
         setMode("add")
+    }
+    let handleUpdateData =()=>{
+        
+        let newClient = clients.filter(client=>client._id==forms.client);
+        let newPayerCheque = forms.payer_cheque
+        let newPayerEspece = forms.payer_espece
+        let newPayerCredit = parseInt(forms.payer_credit)-(parseInt(newPayerCheque)+parseInt(newPayerEspece));
+        let OperationToEdit = {panierToUpdate:{...operations.filter(op=>op._id===idToEdit)[0],client:newClient,payer_credit:newPayerCredit,payer_cheque:newPayerCheque,payer_espece:newPayerEspece}};
+        console.log(OperationToEdit);
+        let data = qs.stringify(OperationToEdit)
+        axios.post(`${baseUrlToUse}/operation/update`,data).then((response)=>{
+            setMode("add")
+            resetForm()
+            setErrorMsg(response.data.message)
+            getOperations()
+        }) 
     }
     let handleSubmit =(event)=>{
         event.preventDefault()
@@ -98,9 +124,9 @@ return(
                 <div className="form-group">
                     <label htmlFor="titre">{label.client}</label>
                     <select type="text" onChange={handleChange} value={forms.client} className="form-control" id="designation" name="client" aria-describedby="client">
-                    <option value="">Selectionnez un client</option>
-                    {clients.map((client)=>{
-                        return <option value={client._id}>{client.firstname} , {client.lastname} , {client.company}</option>
+                    <option key={0} value="">Selectionnez un client</option>
+                    {clients.map((client,index)=>{
+                        return <option key={index+1} value={client._id}>{client.firstname} , {client.lastname} , {client.company}</option>
                     })}
                     </select>
                 </div>
@@ -122,7 +148,7 @@ return(
                 {mode==="add" && <button type="submit" className="mt-3 btn btn-success">Ajouter une commande</button>}
                 {mode==="edit" &&  
                 <div className="d-flex justify-content-between col-lg-5 col-sm-12">
-                    <button type="button"  onClick={handleEdit} className="mt-3 mr-2 btn btn-warning">Confirmer modification</button>
+                    <button type="button"  onClick={handleUpdateData} className="mt-3 mr-2 btn btn-warning">Confirmer modification</button>
                     <button type="button" onClick={handleCancelEdit} className="mt-3 btn btn-info">Annuler modification</button>
                 </div>}
                 
@@ -161,7 +187,7 @@ return(
                         <th className="borderTh">
                         {label.date_modification}
                         </th>
-                        <th colSpan="2" className="borderTh">
+                        <th colSpan="3" className="borderTh">
                         Actions
                         </th>
                     </tr>    
@@ -171,7 +197,7 @@ return(
                         return (
                             <tr className="text-white bg-info" key={operations._id}>
                                 <td>{operations._id}</td>
-                                <td>{operations.client[0].company}</td>
+                                <td>{}</td>
                                 <td>{operations.quantite}</td>
                                 <td>{operations.prix_ttc}</td>
                                 <td>{operations.payer_cheque}</td>
@@ -180,6 +206,7 @@ return(
                                 <td>{operations.date_operation}</td>
                                 <td>{operations.date_modification}</td>
                                 <td>{(role=="admin"||role=="livreur") && <><button onClick={()=>{handlePanier(operations._id)}} className="btn btn-warning" >Panier</button></>}</td>
+                                <td>{(role=="admin") && <><button onClick={()=>{handleEdit(operations._id)}} className="btn btn-primary" >Modifier</button></>}</td>
                                 <td>{role=="admin"&& <><button onClick={()=>{handleDeleteOperations(operations._id)}} className="btn btn-danger" >Supprimer</button></>}</td>
                             </tr>
                         )
