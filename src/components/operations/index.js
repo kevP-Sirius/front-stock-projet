@@ -24,7 +24,7 @@ let Operations = ({role,connect,env})=>{
     }
     let getOperations =()=>{
         axios.get(`${baseUrlToUse}/operations/list`).then((response)=>{
-            console.log(response) 
+           
             setOperations([...response.data])
         })
     }
@@ -68,7 +68,6 @@ let Operations = ({role,connect,env})=>{
         let newPayerEspece = forms.payer_espece
         let newPayerCredit = parseInt(forms.payer_credit)-(parseInt(newPayerCheque)+parseInt(newPayerEspece));
         let OperationToEdit = {panierToUpdate:{...operations.filter(op=>op._id===idToEdit)[0],client:newClient,payer_credit:newPayerCredit,payer_cheque:newPayerCheque,payer_espece:newPayerEspece}};
-        console.log(OperationToEdit);
         let data = qs.stringify(OperationToEdit)
         axios.post(`${baseUrlToUse}/operation/update`,data).then((response)=>{
             setMode("add")
@@ -106,7 +105,7 @@ let Operations = ({role,connect,env})=>{
     useEffect(()=>{
         if(localStorage.getItem("user")!==null){
             const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
-            console.log(userInfo) 
+           
             connect(userInfo)
         }else{
             if(role!=="admin" && role!=="comptable"){

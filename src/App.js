@@ -15,7 +15,6 @@ const App = ({firststate,firstAction,role,connect}) => {
   useEffect(()=>{
     if(localStorage.getItem("user")!==null){
       const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
-      console.log(userInfo) 
       connect(userInfo)
     }
   },[])

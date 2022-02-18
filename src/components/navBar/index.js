@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import "./navBar.scss"
 let NavBar = ({isConnected,role, username,disconnect })=>{
     useEffect(()=>{
-        console.log(username)
+      
     },[username])
  return(
     < nav className="navbar navbar-expand-lg  navbar-light bg-light">
