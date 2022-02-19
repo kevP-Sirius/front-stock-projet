@@ -127,7 +127,7 @@ return(
         <> 
         <>
         {(role=="admin") && 
-            <h1 class="mb-3">Bénéfice actuel : {benefice.actuel} / Bénéfice previsionnel : {benefice.previsionnel}</h1>
+            <h1 className="mb-3">Bénéfice actuel : {benefice.actuel} / Bénéfice previsionnel : {benefice.previsionnel}</h1>
         }
         
         </>
@@ -210,7 +210,7 @@ return(
                         return (
                             <tr className="text-white bg-info" key={operations._id}>
                                 <td>{operations._id}</td>
-                                <td>{}</td>
+                                <td>{operations.client[0].company}</td>
                                 <td>{operations.quantite}</td>
                                 <td>{operations.prix_ttc}</td>
                                 <td>{operations.payer_cheque}</td>
