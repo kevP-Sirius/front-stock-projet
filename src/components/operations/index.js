@@ -13,6 +13,7 @@ let Operations = ({role,connect,env})=>{
     let [mode,setMode ] = useState('add')
     let [errorMsg,setErrorMsg]= useState("")
     let [operations , setOperations ] =useState([]) 
+    let [benefice,setBenefice ]= useState({previsionnel:0,actuel:0})
     let baseUrlProd = "http://3.145.43.146:9001"
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
@@ -24,13 +25,13 @@ let Operations = ({role,connect,env})=>{
     }
     let getOperations =()=>{
         axios.get(`${baseUrlToUse}/operations/list`).then((response)=>{
-           
+            setBenefice({...benefice,actuel:0,previsionnel:0});
             setOperations([...response.data])
         })
     }
     let resetForm =()=>{
         setForm({client:'',payer_espece:"",payer_cheque:'',payer_credit:''})
-    }
+    } 
     let handleChange = (event)=>{
         let {name,value} = event.target
         setForm({...forms,[name]:value});
@@ -114,9 +115,22 @@ let Operations = ({role,connect,env})=>{
         }
         
     },[role])
+    useEffect(()=>{
+        
+        operations.map((operation)=>{
+            setBenefice({...benefice,actuel:benefice.actuel+parseInt(operation.payer_cheque)+parseInt(operation.payer_espece),previsionnel:benefice.previsionnel+parseInt(operation.prix_ttc)})
+        })
+    },[operations])
     
 return(
+       
         <> 
+        <>
+        {(role=="admin") && 
+            <h1 class="mb-3">Bénéfice actuel : {benefice.actuel} / Bénéfice previsionnel : {benefice.previsionnel}</h1>
+        }
+        
+        </>
         {(role =="admin"||role=="livreur") &&
         
         <form onSubmit={handleSubmit} className="mb-3">
