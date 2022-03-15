@@ -1,10 +1,10 @@
 import {
-  FIRST_TYPE,LOGIN_TYPE,SIGNUP_TYPE,updateErrorMessage,connect
+  FIRST_TYPE,LOGIN_TYPE,SIGNUP_TYPE,updateErrorMessage,connect,env
 } from '../store/reducer/appReducer';
 const axios = require('axios');
 const qs = require('qs');
 let base_url="http://localhost:9001"
-let env="prod"
+
     let baseUrlProd = "http://3.145.43.146:9001"
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import * as moment from 'moment';
 const qs = require('qs');
 
-let Users = ({role,connect})=>{
+let Users = ({role,connect,env})=>{
     let navigate = useNavigate();
     const [forms,setForm ] = useState({username:'',password:'',email:'',role:'admin'})
     const label = {username:'identifiant',password:'mot de passe',email:"email",role:'role',last_connexion:'dernière connexion',date_modification:'date de modification'}
@@ -12,7 +12,6 @@ let Users = ({role,connect})=>{
     let [idToUpdate,setIdToUpdate] = useState(null)
     let [errorMsg,setErrorMsg]= useState("")
     let [users , setUsers ] =useState([])
-    let env="prod"
     let baseUrlProd = "http://3.145.43.146:9001"
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd

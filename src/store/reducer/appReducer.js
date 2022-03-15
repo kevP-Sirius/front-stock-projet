@@ -6,7 +6,7 @@ const initialState = {
     isConnected:false,
     messageError:'',
     messageStatus:'',
-    env:'prod'
+    env:'dev'
 
   };
   
@@ -95,9 +95,11 @@ const initialState = {
     type: DISCONNECT,
   });
   
+  
 
 
   
   
   // == Export
-  
+
+  export const env = initialState.env;
