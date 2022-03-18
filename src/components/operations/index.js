@@ -7,7 +7,7 @@ const qs = require('qs');
 
 let Operations = ({role,connect,env})=>{
     let navigate = useNavigate();
-    let [forms,setForm ] = useState({client:'',payer_espece:"",payer_cheque:'',payer_credit:''})
+    let [forms,setForm ] = useState({client:'',payer_espece:"0",payer_cheque:'0',payer_credit:'0'})
     let [clients,setClients] =useState([])
     const label = {_id:'n° commande',product:'produit',client:'client',prix_ttc:"ttc",prix_vente:"prix de vente", date_operation:"date",date_modification:'modification',quantite:"quantite",payer_espece:"espèce",payer_cheque:'chèque',payer_credit:'montant à régler'}
     let [mode,setMode ] = useState('add')

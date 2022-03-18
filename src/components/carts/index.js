@@ -154,7 +154,7 @@ let Cart =({role,isConnected,connect,env})=>{
                 <div className="col-8 m-3">
                     {products.map((product,index)=>{
                         return(
-                                <div className="card cardStyle"  key={product._id,index}>
+                                <div className="card cardStyle"  key={product._id}>
                                 <div className="card-body" key={product._id} >
                                 <h5 className="card-title">{product.designation}</h5>
                                 <p className="card-text">prix : {product.prix_vente} euros</p>
