@@ -67,7 +67,8 @@ let FormCart  =({role,isConnected,connect,env})=>{
     },[errorMsg])
     let addArticle =(newProduct)=>{
         let searchIndex = operations.produit.findIndex(item=>item._id==newProduct._id)
-        let data = qs.stringify({_id:newProduct._id})
+        let quantiteToCheck = parseInt(forms.quantite)
+        let data = qs.stringify({_id:newProduct._id,quantite:quantiteToCheck})
         
         axios.post(`${baseUrlToUse}/article/checkstock`,data).then((reponse)=>{
             
@@ -83,16 +84,19 @@ let FormCart  =({role,isConnected,connect,env})=>{
                     newProduitList[searchIndex]=productToAdd
                     let newQuantiteTotal=parseInt(operations.quantite)+parseInt(forms.quantite)
                     let newPrixTtc = 0
-                    let newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:parseInt(forms.quantite),action:"add"}}
+                    let newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:parseInt(forms.quantite),action:"add",userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
                     newPanier.panierToUpdate.produit.map(product=>{
                         newQuantiteTotal+=parseInt(product.quantite);
                         newPrixTtc+=parseInt(product.quantite*product.prix_vente)
                     })
                     let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
-                    newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
+                    newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
                     
                     let updateData = qs.stringify(newPanier)
                     axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
+                        if(response.data.status!==200){
+                            setErrorMsg("stock insuffisant")
+                        }
                         getProducts()
                         getOperations()
                         resetForm()
@@ -104,15 +108,18 @@ let FormCart  =({role,isConnected,connect,env})=>{
                     let newQuantiteTotal = 0 
                     let newPrixTtc = 0
                     let quantiteToDown = parseInt(forms.quantite)
-                    let newPanier = {panierToUpdate:{...operations,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
+                    let newPanier = {panierToUpdate:{...operations,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
                     newPanier.panierToUpdate.produit.map(product=>{
                         newQuantiteTotal+=parseInt(product.quantite);
                         newPrixTtc+=parseInt(product.quantite*product.prix_vente)
                     })
                     let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
-                    newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add'}}
+                    newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
                     let updateData = qs.stringify(newPanier)
                     axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
+                        if(response.data.status!==200){
+                            setErrorMsg("stock insuffisant")
+                        }
                         getProducts()
                         getOperations()
                         resetForm()
@@ -140,9 +147,12 @@ let FormCart  =({role,isConnected,connect,env})=>{
                 newPrixTtc+=parseInt(product.quantite*product.prix_vente)
             })
             let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
-            newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'edit'}}
+            newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'edit',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
             let updateData = qs.stringify(newPanier)
             axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
+                if(response.data.status!==200){
+                    setErrorMsg("stock insuffisant")
+                }
                 setMode('add')
                 getProducts()
                 getOperations()
@@ -171,6 +181,9 @@ let FormCart  =({role,isConnected,connect,env})=>{
             newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduit],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:articleToDelete._id,quantiteToDown:quantiteToDown,action:'delete'}}
             let updateData = qs.stringify(newPanier)
             axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
+                if(response.data.status!==200){
+                    setErrorMsg("stock insuffisant")
+                }
                 getProducts()
                 getOperations()
                 resetForm()
