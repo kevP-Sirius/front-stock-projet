@@ -27,6 +27,10 @@ let FormCart  =({role,isConnected,connect,env})=>{
     let [optionList , setOptionList ] = useState([])
     let userInfo=null
     useEffect(()=>{
+        if(localStorage.getItem("user")!==null){
+            userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
+            connect(userInfo)
+        }
         getOperations()
         getProducts()
     },[])
@@ -70,7 +74,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
         let searchIndex = operations.produit.findIndex(item=>item._id==newProduct._id)
         let quantiteToCheck = parseInt(forms.quantite)
         let data = qs.stringify({_id:newProduct._id,quantite:quantiteToCheck})
-        
+        userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
         axios.post(`${baseUrlToUse}/article/checkstock`,data).then((reponse)=>{
             
            
@@ -133,6 +137,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
     }
     let editArticle =(newProduct)=>{
         let searchIndex = operations.produit.findIndex(item=>item._id==newProduct._id)
+        userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
         if(searchIndex!==-1){
             let newQuantite=parseInt(forms.quantite)
             let productToAdd = {_id:newProduct._id,designation:newProduct.designation,prix_vente:newProduct.prix_vente,quantite:newQuantite}
@@ -165,7 +170,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
     let deleteArticle =(articleToDelete)=>{
         let newProduit = operations.produit.filter(item=>item._id!==articleToDelete._id);
         let searchIndex = operations.produit.findIndex(item=>item._id==articleToDelete._id)
-        
+        userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
         if(searchIndex!==-1){
             
             let newProduitList = [...operations.produit]

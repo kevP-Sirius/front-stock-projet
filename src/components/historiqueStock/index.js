@@ -10,8 +10,9 @@ let HistoriqueStock =({role,env,connect})=>{
    let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
    let getHistoriqueData =()=>{
     axios.get(`${baseUrlToUse}/historique/list`).then((response)=>{
-        console.log(response.data)
+        
         setHistoriqueData(response.data);
+        
     })
    }
    useEffect(()=>{
@@ -64,26 +65,35 @@ let HistoriqueStock =({role,env,connect})=>{
                         </tr>    
                     </thead>
                     <tbody>  
-                        
                         {historiqueData.map((data,key)=>{
-                            <tr key={key}>
+                          return (
+                            <tr className="text-white bg-info" key={key}>
                                 <td>
-                                data
+                                {data.command_ref}
                                 </td>
                                 <td>
-                                data
+                                {data.username}
                                 </td>
                                 <td>
-                                data
+                                {data.role}
                                 </td>
                                 <td>
-                                data
+                                {data.action}
                                 </td>
                                 <td>
-                                data
+                                {data.action_qte}
                                 </td>
-
+                                <td>
+                                {data.previous_state}
+                                </td>
+                                <td>
+                                {data.next_state}
+                                </td>
+                                <td>
+                                {data.date_modification}
+                                </td>
                             </tr>
+                          )
                         })}
                     </tbody>
                 </table>
