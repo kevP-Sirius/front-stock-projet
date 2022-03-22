@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-let HistoriqueStock =({role,env})=>{
+let HistoriqueStock =({role,env,connect})=>{
     let navigate = useNavigate();
    const [historiqueData , setHistoriqueData] = useState([]);
    let baseUrlProd = "http://3.145.43.146:9001"
