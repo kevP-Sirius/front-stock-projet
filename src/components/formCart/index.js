@@ -24,14 +24,15 @@ let FormCart  =({role,isConnected,connect,env})=>{
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let [operations , setOperations ] =useState([]) 
-    let [optionList , setOptionList ] = useState([]) 
+    let [optionList , setOptionList ] = useState([])
+    let userInfo=null
     useEffect(()=>{
         getOperations()
         getProducts()
     },[])
     useEffect(()=>{
         if(localStorage.getItem("user")!==null){
-            const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
+            userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
             
             connect(userInfo)
         }else{
@@ -147,7 +148,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                 newPrixTtc+=parseInt(product.quantite*product.prix_vente)
             })
             let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
-            newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'edit',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
+            newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'edit',userInfo:userInfo,quantiteToCheck:quantiteToDown}}
             let updateData = qs.stringify(newPanier)
             axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                 if(response.data.status!==200){
@@ -178,7 +179,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                 newPrixTtc+=parseInt(product.quantite*product.prix_vente)
             })
             let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
-            newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduit],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:articleToDelete._id,quantiteToDown:quantiteToDown,action:'delete'}}
+            newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduit],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:articleToDelete._id,quantiteToDown:quantiteToDown,action:'delete',userInfo:userInfo,quantiteToCheck:quantiteToDown}}
             let updateData = qs.stringify(newPanier)
             axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                 if(response.data.status!==200){
