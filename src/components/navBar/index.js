@@ -39,6 +39,9 @@ let NavBar = ({isConnected,role, username,disconnect })=>{
             <li className="nav-item">
                 <Link className="nav-link active"  to="/users">Listes des utilisateurs</Link>
             </li>
+            <li className="nav-item">
+                <Link className="nav-link active"  to="/historiquestock">Historique</Link>
+            </li>
         </>}
         {isConnected  && role==="comptable" && 
         <>
