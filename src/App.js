@@ -10,6 +10,7 @@ import OperationsContainer from "./container/operationContainer";
 import CartsContainer from "./container/cartContainer";
 import FormCartContainer from "./container/FormCartContainer";
 import HistoriqueStockContainer from "./container/historiqueStockContainer";
+import HistoriqueFinancierContainer from "./container/historiqueFinancierContainer";
 const App = ({firststate,firstAction,role,connect}) => {
 
   
@@ -35,6 +36,7 @@ const App = ({firststate,firstAction,role,connect}) => {
                 <Route path="/formcart" element={<FormCartContainer />} />
                 <Route path="/users" element={<UsersContainer />} />
                 <Route path="/historiquestock" element={<HistoriqueStockContainer />} />
+                <Route path="/historiquefinancier" element={<HistoriqueFinancierContainer />} />
             </Routes>
        
     </div>

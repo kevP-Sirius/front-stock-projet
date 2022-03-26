@@ -9,7 +9,7 @@ let Operations = ({role,connect,env})=>{
     let navigate = useNavigate();
     let [forms,setForm ] = useState({client:'',payer_espece:"0",payer_cheque:'0',payer_credit:'0'})
     let [clients,setClients] =useState([])
-    const label = {_id:'n° commande',product:'produit',client:'client',prix_ttc:"ttc",prix_vente:"prix de vente", date_operation:"date",date_modification:'modification',quantite:"quantite",payer_espece:"espèce",payer_cheque:'chèque',payer_credit:'montant à régler'}
+    const label = {_id:'n° commande',owner:'utilisateur',role:'role',product:'produit',client:'client',prix_ttc:"ttc",prix_vente:"prix de vente", date_operation:"date",date_modification:'modification',quantite:"quantite",payer_espece:"espèce",payer_cheque:'chèque',payer_credit:'montant à régler'}
     let [mode,setMode ] = useState('add')
     let [errorMsg,setErrorMsg]= useState("")
     let [operations , setOperations ] =useState([]) 
@@ -24,7 +24,9 @@ let Operations = ({role,connect,env})=>{
         })
     }
     let getOperations =()=>{
-        axios.get(`${baseUrlToUse}/operations/list`).then((response)=>{
+        let userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
+        let data = qs.stringify({userInfo:userInfo})
+        axios.post(`${baseUrlToUse}/operations/list`,data).then((response)=>{
             setBenefice({...benefice,actuel:0,previsionnel:0});
             setOperations([...response.data])
         })
@@ -40,7 +42,8 @@ let Operations = ({role,connect,env})=>{
         navigate(`/formcart`,{state:{id:id}})
     }
     let handleDeleteOperations=(id)=>{
-        let data = qs.stringify({id:id})
+        let userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
+        let data = qs.stringify({id:id,userInfo:userInfo})
  
         axios.post(`${baseUrlToUse}/operations/delete`,data).then((response)=>{
             setErrorMsg(response.data.message)
@@ -63,12 +66,12 @@ let Operations = ({role,connect,env})=>{
         setMode("add")
     }
     let handleUpdateData =()=>{
-        
+        let userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
         let newClient = clients.filter(client=>client._id==forms.client);
         let newPayerCheque = forms.payer_cheque
         let newPayerEspece = forms.payer_espece
-        let newPayerCredit = parseInt(forms.payer_credit)-(parseInt(newPayerCheque)+parseInt(newPayerEspece));
-        let OperationToEdit = {panierToUpdate:{...operations.filter(op=>op._id===idToEdit)[0],client:newClient,payer_credit:newPayerCredit,payer_cheque:newPayerCheque,payer_espece:newPayerEspece}};
+        let newPayerCredit = (parseInt(operations.filter(op=>op._id===idToEdit)[0].prix_ttc))-(parseInt(newPayerCheque)+parseInt(newPayerEspece));
+        let OperationToEdit = {userInfo:userInfo,panierToUpdate:{...operations.filter(op=>op._id===idToEdit)[0],client:newClient,payer_credit:newPayerCredit,payer_cheque:newPayerCheque,payer_espece:newPayerEspece}};
         let data = qs.stringify(OperationToEdit)
         axios.post(`${baseUrlToUse}/operation/update`,data).then((response)=>{
             setMode("add")
@@ -86,7 +89,8 @@ let Operations = ({role,connect,env})=>{
             }
         }
         let clientToAdd = clients.filter(client=>client._id==forms.client)
-        let data = qs.stringify({...forms,client:clientToAdd})
+        let userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
+        let data = qs.stringify({...forms,client:clientToAdd,userInfo:userInfo})
  
         axios.post(`${baseUrlToUse}/operations/add`,data).then((response)=>{
             resetForm()
@@ -99,9 +103,10 @@ let Operations = ({role,connect,env})=>{
         getClients()
     },[])
     useEffect(()=>{
-        setTimeout(()=>{
+        let t = setTimeout(()=>{
             setErrorMsg('')
         },3000)
+        return () => clearTimeout(t);
     },[errorMsg])
     useEffect(()=>{
         if(localStorage.getItem("user")!==null){
@@ -116,10 +121,16 @@ let Operations = ({role,connect,env})=>{
         
     },[role])
     useEffect(()=>{
-        
-        operations.map((operation)=>{
-            setBenefice({...benefice,actuel:benefice.actuel+parseInt(operation.payer_cheque)+parseInt(operation.payer_espece),previsionnel:benefice.previsionnel+parseInt(operation.prix_ttc)})
+        let actuel=0;
+        let previsionnel=0;
+        operations.map((operation,index)=>{
+            actuel+=parseInt(operation.payer_cheque)+parseInt(operation.payer_espece)
+            previsionnel+=parseInt(operation.prix_ttc)
+            if(index+1==operations.length){
+                setBenefice({...benefice,actuel:actuel,previsionnel:previsionnel})
+            }
         })
+        
     },[operations])
     
 return(
@@ -143,15 +154,15 @@ return(
                     })}
                     </select>
                 </div>
-                <div className="form-group">
+                <div className={role=="admin"?"form-group":"d-none"}>
                     <label htmlFor="payer_espece">{label.payer_espece}</label>
                     <input type="number"  onChange={handleChange} value={forms.payer_espece} className="form-control" id="payer_espece" name="payer_espece" aria-describedby="payer_espece"  />
                 </div>
-                <div className="form-group">
+                <div className={role=="admin"?"form-group":"d-none"}>
                     <label htmlFor="payer_cheque">{label.payer_cheque}</label>
                     <input type="number" onChange={handleChange} value={forms.payer_cheque} className="form-control" id="payer_cheque" name="payer_cheque" aria-describedby="payer_cheque"  />
                 </div>
-                <div className="form-group">
+                <div className="d-none">
                     <label htmlFor="payer_credit">{label.payer_credit}</label>
                     <input type="number" onChange={handleChange} value={forms.payer_credit} className="form-control" id="payer_credit" name="payer_credit" aria-describedby="payer_credit"  />
                 </div>
@@ -176,6 +187,14 @@ return(
                         <th className="borderTh">
                         {label._id}
                         </th>
+                        {role=="admin" && <>
+                        <th className="borderTh">
+                        {label.owner}
+                        </th>
+                        <th className="borderTh">
+                        {label.role}
+                        </th></>}
+                        
                         <th className="borderTh">
                         {label.client}
                         </th>
@@ -210,6 +229,12 @@ return(
                         return (
                             <tr className="text-white bg-info" key={operations._id}>
                                 <td>{operations._id}</td>
+                                {role=="admin" && 
+                                <>
+                                <td>{operations.owner}</td>
+                                <td>{operations.role}</td>
+                                </>}
+                                
                                 <td>{operations.client[0].company}</td>
                                 <td>{operations.quantite}</td>
                                 <td>{operations.prix_ttc}</td>

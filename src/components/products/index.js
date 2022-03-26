@@ -23,7 +23,8 @@ let Products = ({role,connect,env})=>{
         let test = await checkInput()
         addDateModification()
         if(test){
-            let data = qs.stringify({_id:idToUpdate,...forms})
+            let userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
+            let data = qs.stringify({product:{_id:idToUpdate,...forms},userInfo:userInfo})
             axios.post(`${baseUrlToUse}/products/edit`,data).then((response)=>{
                 setMode("add")
                 resetInput()

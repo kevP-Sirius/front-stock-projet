@@ -1,46 +1,78 @@
+
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+const qs = require('qs');
 
-let HistoriqueStock =({role,env,connect})=>{
+let HistoriqueFinancier=({role,env,connect})=>{
     let navigate = useNavigate();
-   const [historiqueData , setHistoriqueData] = useState([]);
-   let baseUrlProd = "http://3.145.43.146:9001"
-   let baseUrlLocal = "http://localhost:9001"
-   let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
-   let getHistoriqueData =()=>{
-    axios.get(`${baseUrlToUse}/historique/list`).then((response)=>{
-        
-        setHistoriqueData(response.data);
-        
-    })
-   }
-   useEffect(()=>{
-    getHistoriqueData()
-   },[])
-   useEffect(()=>{
-    if(localStorage.getItem("user")!==null){
-        const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
-       
-        connect(userInfo)
-    }else{
-        if(role!=="admin"){
-            navigate('/')
-        }
+    const [historiqueData , setHistoriqueData] = useState([]);
+    let [forms,setForm ] = useState({client:''})
+    let [clients,setClients] =useState([])
+    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlLocal = "http://localhost:9001"
+    let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
+    let getHistoriqueData =()=>{
+     axios.get(`${baseUrlToUse}/historiquefinancier/list`).then((response)=>{
+         
+         setHistoriqueData(response.data);
+         
+     })
     }
-    
-},[role])
+    let getClients=()=>{
+        axios.get(`${baseUrlToUse}/clients/list`).then(response=>{
+            setClients(response.data)
+        })
+    }
+    let handleChange = (event)=>{
+        let {name,value} = event.target
+        setForm({...forms,[name]:value});
+    }
+    useEffect(()=>{
+     getHistoriqueData()
+     getClients()
+    },[])
+    useEffect(()=>{
+     if(localStorage.getItem("user")!==null){
+         const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
+        
+         connect(userInfo)
+     }else{
+         if(role!=="admin"){
+             navigate('/')
+         }
+     }
+     
+ },[role])
+ let handleSubmit=(event)=>{
+     event.preventDefault();
+     let data = qs.stringify({search:forms.client})
+     axios.post(`${baseUrlToUse}/historique/search`,data).then((response)=>{
+        setHistoriqueData(response.data);
+     })
+ }
     return(
         <>
             <div className=" table-responsive width-tab-responsive" >
+                <div>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                        <label htmlFor="titre">Liste client</label>
+                        <select type="text" onChange={handleChange} value={forms.client} className="form-control" id="designation" name="client" aria-describedby="client">
+                        <option key={0} value="">Selectionnez un client</option>
+                        {clients.map((client,index)=>{
+                            return <option key={index+1} value={client._id}>{client.firstname} , {client.lastname} , {client.company}</option>
+                        })}
+                        </select>
+                        </div>
+                        <button type="submit" className="mt-3 mb-3 btn btn-success">Rechercher</button>
+                    </form>
+                </div>
                 <table className="table text-center ">
                     <thead className=" bg-warning">
                         <tr>
                             <th className="borderTh">
                             Reference commande
-                            </th>
-                            <th className="borderTh">
-                            Article
                             </th>
                             <th className="borderTh">
                             Utilisateur
@@ -75,9 +107,6 @@ let HistoriqueStock =({role,env,connect})=>{
                                 {data.command_ref}
                                 </td>
                                 <td>
-                                {data.article}
-                                </td>
-                                <td>
                                 {data.username}
                                 </td>
                                 <td>
@@ -104,8 +133,8 @@ let HistoriqueStock =({role,env,connect})=>{
                     </tbody>
                 </table>
             </div>
-        </>
+        </>  
     )
 }
 
-export default HistoriqueStock;
+export default HistoriqueFinancier;
