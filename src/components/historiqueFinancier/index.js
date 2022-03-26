@@ -75,6 +75,9 @@ let HistoriqueFinancier=({role,env,connect})=>{
                             Reference commande
                             </th>
                             <th className="borderTh">
+                            Client
+                            </th>
+                            <th className="borderTh">
                             Utilisateur
                             </th>
                             <th className="borderTh">
@@ -105,6 +108,9 @@ let HistoriqueFinancier=({role,env,connect})=>{
                             <tr className="text-white bg-info" key={key}>
                                 <td>
                                 {data.command_ref}
+                                </td>
+                                <td>
+                                {data.client[0].firstname} , {data.client[0].lastname} , {data.client[0].company}
                                 </td>
                                 <td>
                                 {data.username}
