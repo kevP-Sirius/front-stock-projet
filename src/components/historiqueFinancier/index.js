@@ -2,6 +2,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {Button,Modal} from 'react-bootstrap';
 const qs = require('qs');
 
 let HistoriqueFinancier=({role,env,connect})=>{
@@ -51,8 +52,42 @@ let HistoriqueFinancier=({role,env,connect})=>{
         setHistoriqueData(response.data);
      })
  }
+ const [show, setShow] = useState(false);
+    const [idToDelete, setIdToDelete] = useState(0);
+    const handleClose = () => setShow(false);
+    const handleShow =()=> {
+      
+      setShow(true)
+    };
+    let handleDeleteAllHistorique =(event)=>{
+        const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
+        let data = qs.stringify({userInfo:userInfo})
+        axios.post(`${baseUrlToUse}/historiquefinancial/delete/all`,data).then((response)=>{
+            getHistoriqueData()
+        })
+    }
     return(
         <>
+         <>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Suppréssion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Souhaitez vous confirmer la suppréssion?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={()=>{
+             handleDeleteAllHistorique()
+              setShow(false);
+              }}>
+            Confirmer la suppréssion
+          </Button>
+          <Button variant="danger" onClick={handleClose}>
+            Annuler
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+   
             <div className=" table-responsive width-tab-responsive" >
                 <div>
                     <form onSubmit={handleSubmit}>
@@ -68,6 +103,7 @@ let HistoriqueFinancier=({role,env,connect})=>{
                         <button type="submit" className="mt-3 mb-3 btn btn-primary">Rechercher</button>
                     </form>
                 </div>
+                <button type="button" onClick={()=>{handleShow()}} className="mt-3 mb-3 btn btn-danger">Supprimer tout l'historique</button>
                 <table className="table text-center ">
                     <thead className=" bg-warning">
                         <tr>

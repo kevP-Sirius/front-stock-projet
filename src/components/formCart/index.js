@@ -49,7 +49,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
         axios.get(`${baseUrlToUse}/products`).then((response)=>{
             SetProducts([...response.data])
             let data = response.data.filter(product=>parseInt(product.quantite_en_stock)>0)   
-            setOptionList([...data]) 
+            setOptionList([...response.data]) 
         }) 
     }
     let getOperations =()=>{
@@ -78,59 +78,59 @@ let FormCart  =({role,isConnected,connect,env})=>{
         axios.post(`${baseUrlToUse}/article/checkstock`,data).then((reponse)=>{
             
            
-            if(reponse.data.status==200){
-                if(searchIndex!==-1){
-                    let newQuantite=parseInt(operations.produit[searchIndex].quantite)+parseInt(forms.quantite)
-                    let productToAdd = {_id:newProduct._id,designation:newProduct.designation,prix_vente:newProduct.prix_vente,quantite:newQuantite}
-                    let newProduitList = [...operations.produit]
-                    let oldQte =  parseInt(newProduitList[searchIndex].quantite);
-                    let quantiteToDown = 0;
-                    quantiteToDown = parseInt(forms.quantite)
-                    newProduitList[searchIndex]=productToAdd
-                    let newQuantiteTotal=parseInt(operations.quantite)+parseInt(forms.quantite)
-                    let newPrixTtc = 0
-                    let newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:parseInt(forms.quantite),action:"add",userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
-                    newPanier.panierToUpdate.produit.map(product=>{
-                        newQuantiteTotal+=parseInt(product.quantite);
-                        newPrixTtc+=parseInt(product.quantite*product.prix_vente)
-                    })
-                    let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
-                    newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
-                    
-                    let updateData = qs.stringify(newPanier)
-                    axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
-                        if(response.data.status!==200){
-                            setErrorMsg("stock insuffisant")
-                        }
-                        getProducts()
-                        getOperations()
-                        resetForm()
-                    })
-        
-                }else{
-                    let newQuantite = parseInt(operations.quantite)+parseInt(forms.quantite)
-                    let productToAdd = {_id:newProduct._id,designation:newProduct.designation,prix_vente:newProduct.prix_vente,quantite:forms.quantite}
-                    let newQuantiteTotal = 0 
-                    let newPrixTtc = 0
-                    let quantiteToDown = parseInt(forms.quantite)
-                    let newPanier = {panierToUpdate:{...operations,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
-                    newPanier.panierToUpdate.produit.map(product=>{
-                        newQuantiteTotal+=parseInt(product.quantite);
-                        newPrixTtc+=parseInt(product.quantite*product.prix_vente)
-                    })
-                    let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
-                    newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
-                    let updateData = qs.stringify(newPanier)
-                    axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
-                        if(response.data.status!==200){
-                            setErrorMsg("stock insuffisant")
-                        }
-                        getProducts()
-                        getOperations()
-                        resetForm()
-                    })
-                }
+            
+            if(searchIndex!==-1){
+                let newQuantite=parseInt(operations.produit[searchIndex].quantite)+parseInt(forms.quantite)
+                let productToAdd = {_id:newProduct._id,designation:newProduct.designation,prix_vente:newProduct.prix_vente,quantite:newQuantite}
+                let newProduitList = [...operations.produit]
+                let oldQte =  parseInt(newProduitList[searchIndex].quantite);
+                let quantiteToDown = 0;
+                quantiteToDown = parseInt(forms.quantite)
+                newProduitList[searchIndex]=productToAdd
+                let newQuantiteTotal=parseInt(operations.quantite)+parseInt(forms.quantite)
+                let newPrixTtc = 0
+                let newPanier = {panierToUpdate:{...operations,produit:[...newProduitList],quantite:newQuantiteTotal,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:parseInt(forms.quantite),action:"add",userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
+                newPanier.panierToUpdate.produit.map(product=>{
+                    newQuantiteTotal+=parseInt(product.quantite);
+                    newPrixTtc+=parseInt(product.quantite*product.prix_vente)
+                })
+                let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
+                newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...newProduitList],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
+                
+                let updateData = qs.stringify(newPanier)
+                axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
+                    if(response.data.status!==200){
+                        setErrorMsg("stock insuffisant")
+                    }
+                    getProducts()
+                    getOperations()
+                    resetForm()
+                })
+    
+            }else{
+                let newQuantite = parseInt(operations.quantite)+parseInt(forms.quantite)
+                let productToAdd = {_id:newProduct._id,designation:newProduct.designation,prix_vente:newProduct.prix_vente,quantite:forms.quantite}
+                let newQuantiteTotal = 0 
+                let newPrixTtc = 0
+                let quantiteToDown = parseInt(forms.quantite)
+                let newPanier = {panierToUpdate:{...operations,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
+                newPanier.panierToUpdate.produit.map(product=>{
+                    newQuantiteTotal+=parseInt(product.quantite);
+                    newPrixTtc+=parseInt(product.quantite*product.prix_vente)
+                })
+                let restToPaid = newPrixTtc-parseInt(operations.payer_espece)+parseInt(operations.payer_cheque)
+                newPanier = {panierToUpdate:{...operations,payer_credit:restToPaid,produit:[...operations.produit,productToAdd],quantite:newQuantite,prix_ttc:newPrixTtc},productToDownStock:{_id:productToAdd._id,quantiteToDown:quantiteToDown,action:'add',userInfo:userInfo,quantiteToCheck:quantiteToCheck}}
+                let updateData = qs.stringify(newPanier)
+                axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
+                    if(response.data.status!==200){
+                        setErrorMsg("stock insuffisant")
+                    }
+                    getProducts()
+                    getOperations()
+                    resetForm()
+                })
             }
+            
         })
         
         
@@ -229,39 +229,39 @@ let FormCart  =({role,isConnected,connect,env})=>{
             case 'designation':
                 setForm({...forms,[name]:value});
                 break;
-            case 'quantite':
-                let selectedProduct = products.filter(product=>product._id==forms.designation)
+            // case 'quantite':
+            //     let selectedProduct = products.filter(product=>product._id==forms.designation)
                 
-                let quantiteMax = 0
+            //     let quantiteMax = 0
                
-                if(mode=="add"){
-                    if(selectedProduct.length>0){
-                        quantiteMax = parseInt(selectedProduct[0].quantite_en_stock)
-                    }
+            //     if(mode=="add"){
+            //         if(selectedProduct.length>0){
+            //             quantiteMax = parseInt(selectedProduct[0].quantite_en_stock)
+            //         }
                     
-                    if(parseInt(value)>quantiteMax){
-                        setForm({...forms,[name]:quantiteMax});
-                    }else{
-                        setForm({...forms,[name]:value});
-                    }
-                }else{
-                    let productPanierQte = panier.filter(item=>item._id==forms.designation)[0].quantite
+            //         if(parseInt(value)>quantiteMax){
+            //             setForm({...forms,[name]:quantiteMax});
+            //         }else{
+            //             setForm({...forms,[name]:value});
+            //         }
+            //     }else{
+            //         let productPanierQte = panier.filter(item=>item._id==forms.designation)[0].quantite
                    
-                    if(parseInt(productPanierQte)>0){
-                        quantiteMax = parseInt(productPanierQte)+parseInt(selectedProduct[0].quantite_en_stock)
-                    }else{
-                        quantiteMax = parseInt(selectedProduct[0].quantite_en_stock)
-                    }
-                    if(parseInt(value)>quantiteMax){
-                        setForm({...forms,[name]:quantiteMax});
-                    }else{
-                        setForm({...forms,[name]:value});
-                    }
-                }
+            //         if(parseInt(productPanierQte)>0){
+            //             quantiteMax = parseInt(productPanierQte)+parseInt(selectedProduct[0].quantite_en_stock)
+            //         }else{
+            //             quantiteMax = parseInt(selectedProduct[0].quantite_en_stock)
+            //         }
+            //         if(parseInt(value)>quantiteMax){
+            //             setForm({...forms,[name]:quantiteMax});
+            //         }else{
+            //             setForm({...forms,[name]:value});
+            //         }
+            //     }
                 
                
                 
-                break;
+            //     break;
             default:
                 setForm({...forms,[name]:value});
                 break;
