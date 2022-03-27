@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {Button,Modal} from 'react-bootstrap';
 import * as moment from 'moment';
 const qs = require('qs');
 
@@ -12,14 +13,15 @@ let Clients = ({role,connect,env})=>{
     let [idToUpdate,setIdToUpdate] = useState(null)
     let [errorMsg,setErrorMsg]= useState("")
     let [clients , setClients ] =useState([])
+    let [clientsDataList , setClientsDataList ] =useState([])
     let baseUrlProd = "http://3.145.43.146:9001"
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
    
     let getClients =()=>{
         axios.get(`${baseUrlToUse}/clients/list`).then((response)=>{
-            console.log(response) 
             setClients([...response.data])
+            setClientsDataList([...response.data])
         })
     }
     let handleChange = (event)=>{
@@ -46,7 +48,7 @@ let Clients = ({role,connect,env})=>{
     }
     let handleUpdate = (id)=>{
         let formData = [...clients.filter(client=>client._id==id)]
-        console.log(id)
+       
         moment.locale('fr')
         var currentDate = moment().format("YYYY-MM-DD");
         setForm({...formData[0],date_modification:currentDate})
@@ -57,11 +59,11 @@ let Clients = ({role,connect,env})=>{
        
         let data = qs.stringify({id:id})
         axios.post(`${baseUrlToUse}/clients/delete`,data).then((response)=>{
-            console.log(response)
+            
             setErrorMsg(response.data.message)
             getClients()
         }).catch((error)=>{
-            console.log(error)
+           
         })
     }
     useEffect(()=>{
@@ -75,7 +77,7 @@ let Clients = ({role,connect,env})=>{
     useEffect(()=>{
         if(localStorage.getItem("user")!==null){
             const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
-            console.log(userInfo) 
+            
             connect(userInfo)
         }else{
             if(role!=="admin"){
@@ -90,10 +92,9 @@ let Clients = ({role,connect,env})=>{
     let checkInput  = async ()=>{
         for (let index = 0; index < Object.keys(forms).length; index++) {
             let inputName =Object.keys(forms)[index]
-            console.log(forms[inputName])
-            console.log(inputName)
+            
             if(forms[inputName].length==0 && inputName!=="last_connexion" && inputName!=="date_modification"){
-                console.log(forms[inputName])
+               
                 return  setErrorMsg(`Veuillez saisir un ${label[inputName]}`)
             }
         }
@@ -104,7 +105,7 @@ let Clients = ({role,connect,env})=>{
         setForm({...forms})
         for (let index = 0; index < Object.keys(forms).length; index++) {
             let inputName =Object.keys(forms)[index]
-            if(forms[inputName].length==0){
+            if(forms[inputName].length==0 && (inputName=="firstname"||inputName=="lastname")){
                 return  setErrorMsg(`Veuillez saisir un ${label[inputName]}`)
             }
         }
@@ -115,8 +116,66 @@ let Clients = ({role,connect,env})=>{
             getClients()
         })
     }
+    const [show, setShow] = useState(false);
+    const [idToDelete, setIdToDelete] = useState(0);
+    const handleClose = () => setShow(false);
+    const handleShow =(id)=> {
+      
+    setIdToDelete(id)
+      setShow(true)
+    };
+    const [formSearch, setFormSearch] = useState({firstname:''});
+    let handleSubmitSearch =(event)=>{
+        event.preventDefault()
+        if(formSearch.firstname.length==0){
+            return getClients()
+        }
+        let data = qs.stringify({firstname:formSearch.firstname})
+        axios.post(`${baseUrlToUse}/clients/search`,data).then((response)=>{
+            setClients([...response.data])
+        })
+    }
+    let handleChangeSearch = (event)=>{
+        let {name,value} = event.target
+        setFormSearch({...formSearch,[name]:value});
+    }
 return(
     <>
+        <>
+            <form onSubmit={handleSubmitSearch}>
+                <div className="form-group">
+                <label htmlFor="titre">Rechercher un client</label>
+                <input type="text" onChange={handleChangeSearch} value={formSearch.firstname} className="form-control" id="designation" name="firstname" list="clientList"/>
+                <datalist id="clientList">
+                    {
+                        clientsDataList.map((client,index)=>{
+                            return  <option key={index} value={client.firstname}> {client.firstname} , {client.lastname} , {client.company} </option>
+                        })
+                    }
+                </datalist>
+                </div>
+                <button type="submit" className="mt-3 mb-3 btn btn-primary">Rechercher</button>
+            </form>
+        </>
+     <>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Suppréssion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Souhaitez vous confirmer la suppréssion?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={()=>{
+              handleDeleteClients(idToDelete)
+              setShow(false);
+              }}>
+            Confirmer la suppréssion
+          </Button>
+          <Button variant="danger" onClick={handleClose}>
+            Annuler
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
         <form onSubmit={handleSubmit} className="mb-3">
             <div className="form-group">
                 <label htmlFor="username">{label.firstname}</label>
@@ -187,7 +246,7 @@ return(
                                 <td>{client.ice}</td>
                                 <td>{client.date_modification}</td>
                                 <td><button onClick={()=>{handleUpdate(client._id)}} className="btn btn-warning" >Modifier</button></td>
-                                <td><button onClick={()=>{handleDeleteClients(client._id)}} className="btn btn-danger" >Supprimer</button></td>
+                                <td><button onClick={()=>{handleShow(client._id)}} className="btn btn-danger" >Supprimer</button></td>
                             </tr>
                         )
                     })}

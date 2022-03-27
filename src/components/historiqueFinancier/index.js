@@ -65,7 +65,7 @@ let HistoriqueFinancier=({role,env,connect})=>{
                         })}
                         </select>
                         </div>
-                        <button type="submit" className="mt-3 mb-3 btn btn-success">Rechercher</button>
+                        <button type="submit" className="mt-3 mb-3 btn btn-primary">Rechercher</button>
                     </form>
                 </div>
                 <table className="table text-center ">

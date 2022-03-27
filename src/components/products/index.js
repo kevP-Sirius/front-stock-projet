@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {Button,Modal} from 'react-bootstrap';
 import * as moment from 'moment';
 const qs = require('qs');
 
@@ -11,6 +12,7 @@ let Products = ({role,connect,env})=>{
     let [mode,setMode ] = useState('add')
     let [idToUpdate,setIdToUpdate] = useState(null)
     let [errorMsg,setErrorMsg]= useState("")
+    let [productsDataList , SetProductsDataList ] =useState([])
     let [products , SetProducts ] =useState([])
     let baseUrlProd = "http://3.145.43.146:9001"
     let baseUrlLocal = "http://localhost:9001"
@@ -41,7 +43,7 @@ let Products = ({role,connect,env})=>{
     }
     let handleUpdate = (id)=>{
         let formData = products.filter(product=>product._id==id)
-        console.log(products)
+      
         setForm(...formData)
         setIdToUpdate(id)
         setMode("edit")
@@ -50,11 +52,11 @@ let Products = ({role,connect,env})=>{
        
         let data = qs.stringify({id:id})
         axios.post(`${baseUrlToUse}/products/delete`,data).then((response)=>{
-            console.log(response)
+           
             setErrorMsg(response.data.message)
             getProducts()
         }).catch((error)=>{
-            console.log(error)
+            
         })
     }
     let resetInput = ()=>{
@@ -91,8 +93,18 @@ let Products = ({role,connect,env})=>{
     }
     let getProducts =()=>{
         axios.get(`${baseUrlToUse}/products`).then((response)=>{
-        console.log(response) 
-        SetProducts([...response.data])
+            let sortArray = [...response.data];
+            sortArray.sort((a,b)=>{
+               if(parseInt(a.quantite_en_stock)<parseInt(b.quantite_en_stock)){
+                return -1
+               } 
+               if(parseInt(a.quantite_en_stock)>parseInt(b.quantite_en_stock)){
+                return 1
+               } 
+               return 0
+            })
+            SetProductsDataList([...sortArray])
+        SetProducts([...sortArray])
     }) 
     }
     useEffect(()=>{
@@ -106,7 +118,7 @@ let Products = ({role,connect,env})=>{
     useEffect(()=>{
         if(localStorage.getItem("user")!==null){
             const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
-            console.log(userInfo) 
+          
             connect(userInfo)
         }else{
             if(role!=="admin"){
@@ -115,9 +127,64 @@ let Products = ({role,connect,env})=>{
         }
         
     },[role])
-    
+    const [show, setShow] = useState(false);
+    const [idToDelete, setIdToDelete] = useState(0);
+    const handleClose = () => setShow(false);
+    const handleShow =(id)=> {
+      
+    setIdToDelete(id)
+      setShow(true)
+    };
+    const [formSearch, setFormSearch] = useState({product:''});
+    let handleSubmitSearch =(event)=>{
+        event.preventDefault()
+        if(formSearch.product.length==0){
+            return getProducts()
+        }
+        let data = qs.stringify({designation:formSearch.product})
+        axios.post(`${baseUrlToUse}/products/search`,data).then((response)=>{
+            SetProducts([...response.data])
+        })
+    }
+    let handleChangeSearch = (event)=>{
+        let {name,value} = event.target
+        setFormSearch({...formSearch,[name]:value});
+    }
     return(
         <>
+        <form onSubmit={handleSubmitSearch}>
+            <div className="form-group">
+            <label htmlFor="titre">Rechercher un produit </label>
+            <input type="text" onChange={handleChangeSearch} value={formSearch.product} className="form-control" id="designation" name="product" list="productList"/>
+            <datalist id="productList">
+                {
+                    productsDataList.map((product,index)=>{
+                      return  <option key={index} value={product.designation}>{product.designation}</option>
+                    })
+                }
+            </datalist>
+            </div>
+            <button type="submit" className="mt-3 mb-3 btn btn-primary">Rechercher</button>
+        </form>
+          <>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Suppréssion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Souhaitez vous confirmer la suppréssion?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={()=>{
+              handleDeleteProduct(idToDelete)
+              setShow(false);
+              }}>
+            Confirmer la suppréssion
+          </Button>
+          <Button variant="danger" onClick={handleClose}>
+            Annuler
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
             <form onSubmit={handleSubmit} className="mb-3 ">
                 <div className="form-group">
                     <label htmlFor="titre">{label.designation}</label>
@@ -185,7 +252,7 @@ let Products = ({role,connect,env})=>{
                                 <td>{product.quantite_en_stock}</td>
                                 <td>{product.date_modification}</td>
                                 <td><button onClick={()=>{handleUpdate(product._id)}} className="btn btn-warning" >Modifier</button></td>
-                                <td><button onClick={()=>{handleDeleteProduct(product._id)}} className="btn btn-danger" >Supprimer</button></td>
+                                <td><button onClick={()=>{handleShow(product._id)}} className="btn btn-danger" >Supprimer</button></td>
                             </tr>
                         )
                     })}

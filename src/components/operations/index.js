@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {Button,Modal} from 'react-bootstrap';
 import * as moment from 'moment';
 import './operations.scss'
 const qs = require('qs');
@@ -20,6 +21,7 @@ let Operations = ({role,connect,env})=>{
     let [idToEdit,setIdToEdit] = useState(0)
     let getClients=()=>{
         axios.get(`${baseUrlToUse}/clients/list`).then(response=>{
+            
             setClients(response.data)
         })
     }
@@ -28,11 +30,21 @@ let Operations = ({role,connect,env})=>{
         let data = qs.stringify({userInfo:userInfo})
         axios.post(`${baseUrlToUse}/operations/list`,data).then((response)=>{
             setBenefice({...benefice,actuel:0,previsionnel:0});
-            setOperations([...response.data])
+            let sortArray = [...response.data];
+            sortArray.sort((a,b)=>{
+               if(parseInt(a.payer_credit)>parseInt(b.payer_credit)){
+                return -1
+               } 
+               if(parseInt(a.payer_credit)<parseInt(b.payer_credit)){
+                return 1
+               } 
+               return 0
+            })
+            setOperations([...sortArray])
         })
     }
     let resetForm =()=>{
-        setForm({client:'',payer_espece:"",payer_cheque:'',payer_credit:''})
+        setForm({client:'',payer_espece:"0",payer_cheque:'0',payer_credit:'0'})
     } 
     let handleChange = (event)=>{
         let {name,value} = event.target
@@ -132,10 +144,36 @@ let Operations = ({role,connect,env})=>{
         })
         
     },[operations])
-    
+    const [show, setShow] = useState(false);
+    const [idToDelete, setIdToDelete] = useState(0);
+  const handleClose = () => setShow(false);
+  const handleShow =(id)=> {
+      console.log(id)
+    setIdToDelete(id)
+      setShow(true)
+    };
 return(
        
         <> 
+        <>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Suppréssion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Souhaitez vous confirmer la suppréssion?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={()=>{
+              handleDeleteOperations(idToDelete)
+              setShow(false);
+              }}>
+            Confirmer la suppréssion
+          </Button>
+          <Button variant="danger" onClick={handleClose}>
+            Annuler
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
         <>
         {(role=="admin") && 
             <h1 className="mb-3">Bénéfice actuel : {benefice.actuel} / Bénéfice previsionnel : {benefice.previsionnel}</h1>
@@ -228,7 +266,7 @@ return(
                     {operations.map(operations=>{
                         return (
                             <tr className="text-white bg-info" key={operations._id}>
-                                <td>{operations._id}</td>
+                                <td>{operations.id_show}</td>
                                 {role=="admin" && 
                                 <>
                                 <td>{operations.owner}</td>
@@ -238,14 +276,14 @@ return(
                                 <td>{operations.client[0].company}</td>
                                 <td>{operations.quantite}</td>
                                 <td>{operations.prix_ttc}</td>
-                                <td>{operations.payer_cheque}</td>
                                 <td>{operations.payer_espece}</td>
+                                <td>{operations.payer_cheque}</td>
                                 <td>{operations.payer_credit}</td>
                                 <td>{operations.date_operation}</td>
                                 <td>{operations.date_modification}</td>
                                 <td>{(role=="admin"||role=="livreur") && <><button onClick={()=>{handlePanier(operations._id)}} className="btn btn-warning" >Panier</button></>}</td>
                                 <td>{(role=="admin") && <><button onClick={()=>{handleEdit(operations._id)}} className="btn btn-primary" >Modifier</button></>}</td>
-                                <td>{role=="admin"&& <><button onClick={()=>{handleDeleteOperations(operations._id)}} className="btn btn-danger" >Supprimer</button></>}</td>
+                                <td>{role=="admin"&& <><button onClick={()=>{handleShow(operations._id)}}  className="btn btn-danger" >Supprimer</button></>}</td>
                             </tr>
                         )
                     })}
