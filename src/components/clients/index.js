@@ -105,6 +105,7 @@ let Clients = ({role,connect,env})=>{
         setForm({...forms})
         for (let index = 0; index < Object.keys(forms).length; index++) {
             let inputName =Object.keys(forms)[index]
+            console.log(inputName)
             if(forms[inputName].length==0 && (inputName=="firstname"||inputName=="lastname")){
                 return  setErrorMsg(`Veuillez saisir un ${label[inputName]}`)
             }

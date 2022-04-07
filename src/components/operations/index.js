@@ -50,8 +50,8 @@ let Operations = ({role,connect,env})=>{
         let {name,value} = event.target
         setForm({...forms,[name]:value});
     }
-    let handlePanier=(id)=>{
-        navigate(`/formcart`,{state:{id:id}})
+    let handlePanier=(id,id_show)=>{
+        navigate(`/formcart`,{state:{id:id,id_show:id_show}})
     }
     let handleDeleteOperations=(id)=>{
         let userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
@@ -273,7 +273,9 @@ return(
                                 <td>{operations.role}</td>
                                 </>}
                                 
-                                <td>{operations.client[0].company}</td>
+                                <td>{operations.client[0].firstname}
+                                {operations.client[0].company.length>0 && ','+operations.client[0].company}
+                                </td>
                                 <td>{operations.quantite}</td>
                                 <td>{operations.prix_ttc}</td>
                                 <td>{operations.payer_espece}</td>
@@ -281,7 +283,7 @@ return(
                                 <td>{operations.payer_credit}</td>
                                 <td>{operations.date_operation}</td>
                                 <td>{operations.date_modification}</td>
-                                <td>{(role=="admin"||role=="livreur") && <><button onClick={()=>{handlePanier(operations._id)}} className="btn btn-warning" >Panier</button></>}</td>
+                                <td>{(role=="admin"||role=="livreur") && <><button onClick={()=>{handlePanier(operations._id,operations.id_show)}} className="btn btn-warning" >Panier</button></>}</td>
                                 <td>{(role=="admin") && <><button onClick={()=>{handleEdit(operations._id)}} className="btn btn-primary" >Modifier</button></>}</td>
                                 <td>{role=="admin"&& <><button onClick={()=>{handleShow(operations._id)}}  className="btn btn-danger" >Supprimer</button></>}</td>
                             </tr>

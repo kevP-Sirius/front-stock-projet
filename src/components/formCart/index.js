@@ -10,11 +10,11 @@ const qs = require('qs');
 let FormCart  =({role,isConnected,connect,env})=>{
     
     const {state} = useLocation();
-    const { id } = state;
+    const { id,id_show } = state;
     let [products , SetProducts ] = useState([])
-    let [forms,setForm ] = useState({designation:'',quantite:''})
+    let [forms,setForm ] = useState({designation:'',quantite:'',prix_vente:''})
     let [elementToUpdate ,setElementToUpdate] = useState({designation:'',quantite_en_stock:'',prix_vente:''})
-    const label = {designation:'designation',quantite:'quantite'}
+    const label = {designation:'designation',quantite:'quantite',prix_vente:'prix de vente'}
     let [panier,SetPanier] = useState([])
     let [ttc , SetTtc ] =useState(0)
     let [errorMsg,setErrorMsg]= useState("")
@@ -100,7 +100,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                 let updateData = qs.stringify(newPanier)
                 axios.post(`${baseUrlToUse}/panier/update`,updateData).then((response)=>{
                     if(response.data.status!==200){
-                        setErrorMsg("stock insuffisant")
+                        setErrorMsg("Une erreur est survenue")
                     }
                     getProducts()
                     getOperations()
@@ -211,12 +211,32 @@ let FormCart  =({role,isConnected,connect,env})=>{
         } 
         switch (mode) {
             case "add":
-                let newArticle = products.filter(product=>product._id==forms.designation)
-                addArticle(newArticle[0])
+                let newArticle = [...products.filter(product=>product._id==forms.designation)]
+                
+                if(parseInt(forms.prix_vente)==0||isNaN(parseInt(forms.prix_vente))){ 
+                    addArticle(newArticle[0]);
+                    break;
+                }
+                if(newArticle[0].prix_vente!==forms.prix_vente){
+                    newArticle[0]={...newArticle[0],prix_vente:forms.prix_vente}
+                    addArticle(newArticle[0]);
+                    break;
+                }
+                addArticle(newArticle[0]);
                 break;
             case "edit":
-                let newArticleEdit = products.filter(product=>product._id==forms.designation)
-                editArticle(newArticleEdit[0])
+              
+                let newArticleEdit = [...products.filter(product=>product._id==forms.designation)]
+                if(parseInt(forms.prix_vente)==0||isNaN(parseInt(forms.prix_vente))){ 
+                    editArticle(newArticleEdit[0]);
+                    break;
+                }
+                if(newArticleEdit[0].prix_vente!==forms.prix_vente){
+                    newArticleEdit[0]={...newArticleEdit[0],prix_vente:forms.prix_vente}
+                    editArticle(newArticleEdit[0]);
+                    break;
+                }
+                editArticle(newArticleEdit[0]);
                 break;
             default:
                 break;
@@ -227,7 +247,15 @@ let FormCart  =({role,isConnected,connect,env})=>{
         let {name,value} = event.target
         switch (name) {
             case 'designation':
-                setForm({...forms,[name]:value});
+               switch (mode) {
+                   case 'add':
+                    let normalPrice = products.filter(product=>product._id==value)[0].prix_vente
+                    setForm({...forms,prix_vente:normalPrice,[name]:value});
+                       break;
+               
+                   default:
+                    setForm({...forms,[name]:value});
+               }
                 break;
             // case 'quantite':
             //     let selectedProduct = products.filter(product=>product._id==forms.designation)
@@ -269,25 +297,30 @@ let FormCart  =({role,isConnected,connect,env})=>{
         
     }
     
-    let handleEdit =(id)=>{
+    let handleEdit =(id,rowPrice)=>{
         setMode("edit")
+        
         let productToEdit = products.filter(product=>product._id==id);
+        
         
         let itemId = productToEdit[0]._id
         let designation = productToEdit[0].designation
         
         let prix_vente = productToEdit[0].prix_vente
+        if(rowPrice!==forms.prix_vente){
+            prix_vente=rowPrice
+        }
         let quantite_en_stock = productToEdit[0].quantite_en_stock
         setElementToUpdate({_id:itemId,designation:designation,prix_vente:prix_vente,quantite_en_stock:quantite_en_stock})
         let quantiteToUpdate = panier.filter(item=>item._id==id)
-        setForm({...forms,designation:itemId,quantite:quantiteToUpdate[0].quantite})
+        setForm({...forms,designation:itemId,quantite:quantiteToUpdate[0].quantite,prix_vente:prix_vente})
     }
     let handleCancelEdit =()=>{
         setMode("add")
         resetForm()
     }
     let resetForm = ()=>{
-        setForm({designation:'',quantite:''});
+        setForm({designation:'',quantite:'',prix_vente:''});
     }
     return(
         <>
@@ -315,6 +348,10 @@ let FormCart  =({role,isConnected,connect,env})=>{
                     <label htmlFor="Pays">{label.quantite}</label>
                     <input type="number" onChange={handleChange} value={forms.quantite} className="form-control" id="quantite" name="quantite" aria-describedby="quantite"  />
                 </div>
+                <div className="form-group">
+                    <label htmlFor="Pays">{label.prix_vente}</label>
+                    <input type="number" onChange={handleChange} value={forms.prix_vente} className="form-control" id="prix_vente" name="prix_vente" aria-describedby="prix_vente"  />
+                </div>
                 <div className="mt-2">
                     <p className="text-danger">{errorMsg}</p>
                 </div>
@@ -327,7 +364,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                 
 
             </form>
-         <div className="d-flex justify-content-center mb-3"><h6>numéro de commande : {id} </h6></div>
+         <div className="d-flex justify-content-center mb-3"><h6>numéro de commande : {id_show} </h6></div>
          <div className="d-flex justify-content-center mb-3"><h6>total commande ttc: {ttc} euros </h6></div>
          <div className=" table-responsive width-tab-responsive" >
             <table className="table text-center ">
@@ -359,7 +396,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
                                 <td>{item.prix_vente} €</td>
                                 <td>{item.quantite}</td>
                                 <td>{parseInt(item.quantite) * parseInt(item.prix_vente)} €</td>
-                                <td><button onClick={()=>{handleEdit(item._id)}} className="btn btn-warning" >Modifier</button></td>
+                                <td><button onClick={()=>{handleEdit(item._id,item.prix_vente)}} className="btn btn-warning" >Modifier</button></td>
                                 <td><button onClick={()=>{deleteArticle(item)}} className="btn btn-danger" >Supprimer</button></td>
                             </tr>
                         )
