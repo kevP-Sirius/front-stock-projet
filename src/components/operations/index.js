@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import ReactDOMServer from "react-dom/server";
 import { useNavigate } from "react-router-dom";
 import {Button,Modal} from 'react-bootstrap';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
 import * as moment from 'moment';
