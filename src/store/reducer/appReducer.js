@@ -6,7 +6,7 @@ const initialState = {
     isConnected:false,
     messageError:'',
     messageStatus:'',
-    ipProd:'3.16.81.126',
+    ipProd:'3.16.207.62',
     env:'prod'
 
   };
