@@ -17,6 +17,7 @@ const mapStateToProps = (state) => ({
     username: state.appReducer.username,
     messageStatus:state.appReducer.messageStatus,
     env:state.appReducer.env,
+    ipProd:state.appReducer.ipProd,
 });
 
 /* === Actions ===

@@ -5,7 +5,7 @@ import {Button,Modal} from 'react-bootstrap';
 import * as moment from 'moment';
 const qs = require('qs');
 
-let Products = ({role,connect,env})=>{
+let Products = ({role,connect,env,ipProd})=>{
     let navigate = useNavigate();
     const [forms,setForm ] = useState({designation:'',prix_achat:'',prix_vente:'',quantite_en_stock:'',date_modification:''})
     const label = {designation:'designation',prix_achat:"prix d'achat",prix_vente:'prix de vente',quantite_en_stock:'quantité en stock',date_modification:'date de modification'}
@@ -14,7 +14,7 @@ let Products = ({role,connect,env})=>{
     let [errorMsg,setErrorMsg]= useState("")
     let [productsDataList , SetProductsDataList ] =useState([])
     let [products , SetProducts ] =useState([])
-    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlProd = `http://${ipProd}:9001`
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let handleChange = (event)=>{

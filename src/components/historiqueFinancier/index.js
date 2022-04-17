@@ -5,12 +5,12 @@ import { useNavigate } from "react-router-dom";
 import {Button,Modal} from 'react-bootstrap';
 const qs = require('qs');
 
-let HistoriqueFinancier=({role,env,connect})=>{
+let HistoriqueFinancier=({role,env,connect,ipProd})=>{
     let navigate = useNavigate();
     const [historiqueData , setHistoriqueData] = useState([]);
     let [forms,setForm ] = useState({client:''})
     let [clients,setClients] =useState([])
-    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlProd = `http://${ipProd}:9001`
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let getHistoriqueData =()=>{

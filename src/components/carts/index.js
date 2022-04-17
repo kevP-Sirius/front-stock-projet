@@ -5,7 +5,7 @@ import * as moment from 'moment';
 import './cart.scss'
 const qs = require('qs');
 
-let Cart =({role,isConnected,connect,env})=>{
+let Cart =({role,isConnected,connect,env,ipProd})=>{
     
     const {state} = useLocation();
     const { id } = state;
@@ -22,7 +22,7 @@ let Cart =({role,isConnected,connect,env})=>{
     date_modification: ""})
     let label = {quantite:'quantite total',sous_total:'sous-total ttc'}
     let navigate = useNavigate();
-    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlProd = `http://${ipProd}:9001`
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let getProducts =()=>{  

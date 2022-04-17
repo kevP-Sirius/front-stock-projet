@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 // == Import : local
 import Signup from '../components/signup';
 // Action Creators
-import { login,updateErrorMessage,signup , } from '../store/reducer/appReducer';
+import { login,updateErrorMessage,signup } from '../store/reducer/appReducer';
 
 /* === State (données) ===
  * - mapStateToProps retroune un objet de props pour le composant de présentation
@@ -16,6 +16,7 @@ const mapStateToProps = (state) => ({
     messageError:state.appReducer.messageError,
     messageStatus:state.appReducer.messageStatus,
     env:state.appReducer.env,
+    ipProd:state.appReducer.ipProd,
 });
 
 /* === Actions ===

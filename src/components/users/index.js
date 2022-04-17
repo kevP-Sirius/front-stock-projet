@@ -5,7 +5,7 @@ import {Button,Modal} from 'react-bootstrap';
 import * as moment from 'moment';
 const qs = require('qs');
 
-let Users = ({role,connect,env})=>{
+let Users = ({role,connect,env,ipProd})=>{
     let navigate = useNavigate();
     const [forms,setForm ] = useState({username:'',password:'',email:'',role:'admin'})
     const label = {username:'identifiant',password:'mot de passe',email:"email",role:'role',state:'etat',last_connexion:'dernière connexion',date_modification:'date de modification'}
@@ -14,7 +14,7 @@ let Users = ({role,connect,env})=>{
     let [errorMsg,setErrorMsg]= useState("")
     let [users , setUsers ] =useState([])
     let [usersDataList , setUsersDataList] =useState([])
-    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlProd = `http://${ipProd}:9001`
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let getUsers =()=>{

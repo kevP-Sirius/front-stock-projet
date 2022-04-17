@@ -6,6 +6,7 @@ const initialState = {
     isConnected:false,
     messageError:'',
     messageStatus:'',
+    ipProd:'3.16.81.126',
     env:'prod'
 
   };
@@ -103,3 +104,5 @@ const initialState = {
   // == Export
 
   export const env = initialState.env;
+  export const ipProd = initialState.ipProd;
+  

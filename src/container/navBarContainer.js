@@ -17,6 +17,7 @@ const mapStateToProps = (state) => ({
   role: state.appReducer.role,
   username: state.appReducer.username,
   env:state.appReducer.env,
+  ipProd:state.appReducer.ipProd,
 
 });
 

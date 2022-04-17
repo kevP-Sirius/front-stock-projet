@@ -14,6 +14,7 @@ import { firstAction,connect as connecting } from '../store/reducer/appReducer';
  */
 const mapStateToProps = (state) => ({ 
   firststate: state.appReducer.firststate,
+  ipProd:state.appReducer.ipProd,
 });
 
 /* === Actions ===

@@ -11,7 +11,7 @@ import './operations.scss'
 
 const qs = require('qs');
 
-let Operations = ({role,connect,env})=>{
+let Operations = ({role,connect,env,ipProd})=>{
     let [panier,SetPanier] = useState([])
     let [ttc , SetTtc ] =useState(0)
     let [TVA , SetTVA ] =useState(20)
@@ -25,7 +25,7 @@ let Operations = ({role,connect,env})=>{
     let [errorMsg,setErrorMsg]= useState("")
     let [operations , setOperations ] =useState([]) 
     let [benefice,setBenefice ]= useState({previsionnel:0,actuel:0})
-    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlProd = `http://${ipProd}:9001`
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let [idToEdit,setIdToEdit] = useState(0)

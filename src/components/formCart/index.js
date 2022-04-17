@@ -7,7 +7,7 @@ const qs = require('qs');
 
 
 
-let FormCart  =({role,isConnected,connect,env})=>{
+let FormCart  =({role,isConnected,connect,env,ipProd})=>{
     
     const {state} = useLocation();
     const { id,id_show } = state;
@@ -20,7 +20,7 @@ let FormCart  =({role,isConnected,connect,env})=>{
     let [errorMsg,setErrorMsg]= useState("")
     let [mode,setMode ] = useState('add')
     let navigate = useNavigate();
-    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlProd = `http://${ipProd}:9001`
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let [operations , setOperations ] =useState([]) 

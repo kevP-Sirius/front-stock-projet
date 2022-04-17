@@ -5,7 +5,7 @@ import {Button,Modal} from 'react-bootstrap';
 import * as moment from 'moment';
 const qs = require('qs');
 
-let Clients = ({role,connect,env})=>{
+let Clients = ({role,connect,env,ipProd})=>{
     let navigate = useNavigate();
     const [forms,setForm ] = useState({firstname:'',lastname:'',adress:'',company:'',ice:''})
     const label = {firstname:'nom',lastname:'prénom',adress:"adresse",company:"nom de l'entreprise",ice:'ICE',date_modification:'date de modification'}
@@ -14,7 +14,7 @@ let Clients = ({role,connect,env})=>{
     let [errorMsg,setErrorMsg]= useState("")
     let [clients , setClients ] =useState([])
     let [clientsDataList , setClientsDataList ] =useState([])
-    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlProd = `http://${ipProd}:9001`
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
    

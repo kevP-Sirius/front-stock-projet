@@ -16,6 +16,7 @@ const mapStateToProps = (state) => ({
     role:state.appReducer.role,
     isConnected:state.appReducer.isConnected,
     env:state.appReducer.env,
+    ipProd:state.appReducer.ipProd,
 });
 
 /* === Actions ===

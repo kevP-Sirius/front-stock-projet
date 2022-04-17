@@ -4,7 +4,7 @@ import { useNavigate,useLocation } from "react-router-dom";
 import * as moment from 'moment';
 const qs = require('qs');
 
-let Commands =({env})=>{
+let Commands =({env,ipProd})=>{
     console.log(env)
     const {state} = useLocation();
     const { id } = state;
@@ -13,7 +13,7 @@ let Commands =({env})=>{
     let navigate = useNavigate();
     const [forms,setForm ] = useState({_id:''})
     const label = {_id:'numero de commande'}
-    let baseUrlProd = "http://3.145.43.146:9001"
+    let baseUrlProd = `http://${ipProd}:9001`
     let baseUrlLocal = "http://localhost:9001"
     let baseUrlToUse = env=="dev"?baseUrlLocal:baseUrlProd
     let getCommands=()=>{
@@ -28,7 +28,7 @@ let Commands =({env})=>{
             setClients(response.data)
         })
     }
-    let label ={_id:'numéro de commande'}
+    
     useEffect(()=>{
         if(localStorage.getItem("user")!==null){
             const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
