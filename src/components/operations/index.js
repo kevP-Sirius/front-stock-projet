@@ -170,19 +170,21 @@ let Operations = ({role,connect,env,ipProd})=>{
         let clienToUse=''
         let id = idPdf
         let id_show = idPdfShow
+        let internePanier = []
+        let interneTotal = 0
        const req =  axios.get(`${baseUrlToUse}/command/${id}`).then((response)=>{
         
         clienToUse = response.data[0].client[0].firstname
             SetPanier(response.data[0].produit)
+            internePanier = response.data[0].produit
             let newTotal = 0
             response.data[0].produit.map(element=>{
                 newTotal+=element.prix_vente*element.quantite
             })
+            interneTotal=newTotal
             SetTtc(newTotal)
-        })
-        await req;
-       
-        const doc = new jsPDF('p','pt','a4');
+        }).then(()=>{
+            const doc = new jsPDF('p','pt','a4');
         let filename = `Bon_livraison_${id_show}`
         doc.setTextColor(220,53,69);
         doc.text(50, 15, `ROCH`);
@@ -198,15 +200,14 @@ let Operations = ({role,connect,env,ipProd})=>{
         doc.text(45, 30, `le:  ${currentDate}`);
         doc.text(45, 38, `Client:  ${clienToUse}`);
         let arrayBody =[]
-        panier.map((item,index)=>{
-           
+        internePanier.map((item,index)=>{
             arrayBody.push([item.designation,item.prix_vente,item.quantite,`${parseInt(item.quantite) * parseInt(item.prix_vente)} €`,`${(parseInt(item.quantite) * parseInt(item.prix_vente))+((parseInt(item.quantite) * parseInt(item.prix_vente))*TVAtoApply)} €`])
-            if(index+1==panier.length){
+            if(index+1==internePanier.length){
                 autoTable(doc, {
                     head: [['Designation', ' prix unitaire', 'quantite','total article HT','total article TTC']],
                     body: arrayBody,
                   })
-                  let totalPrice = (parseInt(ttc)+(parseInt(ttc)*TVAtoApply));
+                  let totalPrice = (parseInt(interneTotal)+(parseInt(interneTotal)*TVAtoApply));
                   let total = `Sous-total TTC ${totalPrice} €`
                   let tvaText = `TVA appliqué  ${TVA} %`
                   doc.setFontSize(20)
@@ -215,12 +216,17 @@ let Operations = ({role,connect,env,ipProd})=>{
                   doc.output('dataurlnewwindow',filename); 
             }
         })
+        })
+        
+       
+        
         
        
         
         
     }
     let handleShowPdf = (id,idshow)=>{
+        console.log(id,idshow)
     SetidPdf(id)
     SetidPdfShow(idshow)
         setShow1(true);
