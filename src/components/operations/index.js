@@ -1,12 +1,22 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import ReactDOMServer from "react-dom/server";
 import { useNavigate } from "react-router-dom";
 import {Button,Modal} from 'react-bootstrap';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
+import jsPDF from "jspdf";
+import autoTable from 'jspdf-autotable';
 import * as moment from 'moment';
 import './operations.scss'
+
 const qs = require('qs');
 
 let Operations = ({role,connect,env})=>{
+    let [panier,SetPanier] = useState([])
+    let [ttc , SetTtc ] =useState(0)
+    let [TVA , SetTVA ] =useState(20)
+    let [idPdf , SetidPdf ] =useState(0)
+    let [idPdfShow , SetidPdfShow ] =useState(0)
     let navigate = useNavigate();
     let [forms,setForm ] = useState({client:'',payer_espece:"0",payer_cheque:'0',payer_credit:'0'})
     let [clients,setClients] =useState([])
@@ -145,13 +155,82 @@ let Operations = ({role,connect,env})=>{
         
     },[operations])
     const [show, setShow] = useState(false);
+    const [show1, setShow1] = useState(false);
     const [idToDelete, setIdToDelete] = useState(0);
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+      setShow(false)
+      setShow1(false)
+    };
   const handleShow =(id)=> {
       console.log(id)
     setIdToDelete(id)
       setShow(true)
     };
+    let handlePdf= async ()=>{
+        let TVAtoApply = TVA/100
+        let clienToUse=''
+        let id = idPdf
+        let id_show = idPdfShow
+       const req =  axios.get(`${baseUrlToUse}/command/${id}`).then((response)=>{
+        
+        clienToUse = response.data[0].client[0].firstname
+            SetPanier(response.data[0].produit)
+            let newTotal = 0
+            response.data[0].produit.map(element=>{
+                newTotal+=element.prix_vente*element.quantite
+            })
+            SetTtc(newTotal)
+        })
+        await req;
+       
+        const doc = new jsPDF('p','pt','a4');
+        let filename = `Bon_livraison_${id_show}`
+        doc.setTextColor(220,53,69);
+        doc.text(50, 15, `ROCH`);
+        doc.setTextColor(221,220,53);
+        doc.text(80, 15, `    E IBE`);
+        doc.setTextColor(220,53,69);
+        doc.text(115, 15, `     RICA`);
+        doc.text(120, 15, `                Bon de livraison commande n° ${id_show}`);
+        doc.setTextColor(0,0,0);
+        doc.setFontSize(8)
+        moment.locale('fr')
+        var currentDate = moment().format("DD-MM-YYYY");
+        doc.text(45, 30, `le:  ${currentDate}`);
+        doc.text(45, 38, `Client:  ${clienToUse}`);
+        let arrayBody =[]
+        panier.map((item,index)=>{
+           
+            arrayBody.push([item.designation,item.prix_vente,item.quantite,`${parseInt(item.quantite) * parseInt(item.prix_vente)} €`,`${(parseInt(item.quantite) * parseInt(item.prix_vente))+((parseInt(item.quantite) * parseInt(item.prix_vente))*TVAtoApply)} €`])
+            if(index+1==panier.length){
+                autoTable(doc, {
+                    head: [['Designation', ' prix unitaire', 'quantite','total article HT','total article TTC']],
+                    body: arrayBody,
+                  })
+                  let totalPrice = (parseInt(ttc)+(parseInt(ttc)*TVAtoApply));
+                  let total = `Sous-total TTC ${totalPrice} €`
+                  let tvaText = `TVA appliqué  ${TVA} %`
+                  doc.setFontSize(20)
+                  doc.text(tvaText, 350, doc.autoTable.previous.finalY + 30);
+                  doc.text(total, 350, doc.autoTable.previous.finalY + 50);
+                  doc.output('dataurlnewwindow',filename); 
+            }
+        })
+        
+       
+        
+        
+    }
+    let handleShowPdf = (id,idshow)=>{
+    SetidPdf(id)
+    SetidPdfShow(idshow)
+        setShow1(true);
+    }
+    let handleChangeTva =(event)=>{
+        let {name,value} = event.target
+        SetTVA(value);
+        
+    }
 return(
        
         <> 
@@ -167,6 +246,30 @@ return(
               setShow(false);
               }}>
             Confirmer la suppréssion
+          </Button>
+          <Button variant="danger" onClick={handleClose}>
+            Annuler
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+    <>
+      <Modal show={show1} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Taux de TVA à appliquer</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <>
+            <input name="tva" onChange={handleChangeTva} value={TVA}></input> %
+            </>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={()=>{
+              handlePdf()
+              setShow(false);
+              setShow1(false);
+              }}>
+            Générer le bon
           </Button>
           <Button variant="danger" onClick={handleClose}>
             Annuler
@@ -257,7 +360,7 @@ return(
                         <th className="borderTh">
                         {label.date_modification}
                         </th>
-                        <th colSpan="3" className="borderTh">
+                        <th colSpan="4" className="borderTh">
                         Actions
                         </th>
                     </tr>    
@@ -286,6 +389,7 @@ return(
                                 <td>{(role=="admin"||role=="livreur") && <><button onClick={()=>{handlePanier(operations._id,operations.id_show)}} className="btn btn-warning" >Panier</button></>}</td>
                                 <td>{(role=="admin") && <><button onClick={()=>{handleEdit(operations._id)}} className="btn btn-primary" >Modifier</button></>}</td>
                                 <td>{role=="admin"&& <><button onClick={()=>{handleShow(operations._id)}}  className="btn btn-danger" >Supprimer</button></>}</td>
+                                <td>{role=="admin"&& <><button onClick={()=>{handleShowPdf(operations._id,operations.id_show)}}  className="btn btn-secondary" >PDF</button></>}</td>
                             </tr>
                         )
                     })}
