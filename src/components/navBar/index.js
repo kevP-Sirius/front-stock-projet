@@ -57,6 +57,10 @@ let NavBar = ({isConnected,role, username,disconnect })=>{
             <li className="nav-item">
                 <Link className="nav-link active"  to="/operations">Effectuer des opérations</Link>
             </li>
+            <li className="nav-item">
+                <Link className="nav-link active"  to="/clients">Listes des clients</Link>
+            </li>
+            
         </>}
         {isConnected &&
         <>

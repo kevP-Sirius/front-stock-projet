@@ -264,7 +264,7 @@ return(
                                  <td>{user.username}</td>
                                 <td>{user.email}</td>
                                 <td>{user.role}</td>
-                                <td>{user.etat==0?"compte désactiver":"compte activer"}</td>
+                                <td>{user.state==0?"compte désactiver":"compte activer"}</td>
                                 <td>{user.last_connexion}</td>
                                 <td>{user.date_modification}</td>
                                 {user.state!==1 && <>

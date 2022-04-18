@@ -300,11 +300,11 @@ return(
                     })}
                     </select>
                 </div>
-                <div className={role=="admin"?"form-group":"d-none"}>
+                <div className={role=="admin"||role=="livreur"?"form-group":"d-none"}>
                     <label htmlFor="payer_espece">{label.payer_espece}</label>
                     <input type="number"  onChange={handleChange} value={forms.payer_espece} className="form-control" id="payer_espece" name="payer_espece" aria-describedby="payer_espece"  />
                 </div>
-                <div className={role=="admin"?"form-group":"d-none"}>
+                <div className={role=="admin"||role=="livreur"?"form-group":"d-none"}>
                     <label htmlFor="payer_cheque">{label.payer_cheque}</label>
                     <input type="number" onChange={handleChange} value={forms.payer_cheque} className="form-control" id="payer_cheque" name="payer_cheque" aria-describedby="payer_cheque"  />
                 </div>
@@ -392,9 +392,9 @@ return(
                                 <td>{operations.date_operation}</td>
                                 <td>{operations.date_modification}</td>
                                 <td>{(role=="admin"||role=="livreur") && <><button onClick={()=>{handlePanier(operations._id,operations.id_show)}} className="btn btn-warning" >Panier</button></>}</td>
-                                <td>{(role=="admin") && <><button onClick={()=>{handleEdit(operations._id)}} className="btn btn-primary" >Modifier</button></>}</td>
+                                <td>{(role=="admin"||role=="livreur") && <><button onClick={()=>{handleEdit(operations._id)}} className="btn btn-primary" >Modifier</button></>}</td>
                                 <td>{role=="admin"&& <><button onClick={()=>{handleShow(operations._id)}}  className="btn btn-danger" >Supprimer</button></>}</td>
-                                <td>{role=="admin"&& <><button onClick={()=>{handleShowPdf(operations._id,operations.id_show)}}  className="btn btn-secondary" >PDF</button></>}</td>
+                                <td><button onClick={()=>{handleShowPdf(operations._id,operations.id_show)}}  className="btn btn-secondary" >PDF</button></td>
                             </tr>
                         )
                     })}

@@ -75,17 +75,23 @@ let Clients = ({role,connect,env,ipProd})=>{
         },3000)
     },[errorMsg])
     useEffect(()=>{
+        
         if(localStorage.getItem("user")!==null){
             const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
-            
             connect(userInfo)
-        }else{
-            if(role!=="admin"){
-                navigate('/')
+            if(userInfo.role!=="admin" && userInfo.role!=="livreur"){
+                return  navigate('/')
             }
+            
+            
+        }
+        if(role!=="admin" && role!=="livreur"){
+            navigate('/')
         }
         
+        
     },[role])
+    
     let resetInput = ()=>{
         setForm({firstname:'',lastname:'',adress:'',company:'',ice:''})
     }
@@ -247,7 +253,7 @@ return(
                                 <td>{client.ice}</td>
                                 <td>{client.date_modification}</td>
                                 <td><button onClick={()=>{handleUpdate(client._id)}} className="btn btn-warning" >Modifier</button></td>
-                                <td><button onClick={()=>{handleShow(client._id)}} className="btn btn-danger" >Supprimer</button></td>
+                                <td>{role=="admin" && <><button onClick={()=>{handleShow(client._id)}} className="btn btn-danger" >Supprimer</button></>}</td>
                             </tr>
                         )
                     })}
