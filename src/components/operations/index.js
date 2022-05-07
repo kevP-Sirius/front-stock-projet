@@ -11,6 +11,10 @@ import './operations.scss'
 const qs = require('qs');
 
 let Operations = ({role,connect,env,ipProd})=>{
+    const [formsClient,setFormClient ] = useState({firstname:'',lastname:'',adress:'',company:'',ice:''})
+    const labelClient = {firstname:'nom',lastname:'prénom',adress:"adresse",company:"nom de l'entreprise",ice:'ICE',date_modification:'date de modification'}
+    let [errorMsgClient,setErrorMsgClient]= useState("")
+    let [cmdToRedirect,setCmdToRedirect]= useState({id:'',idshow:''})
     let [panier,SetPanier] = useState([])
     let [ttc , SetTtc ] =useState(0)
     let [TVA , SetTVA ] =useState(20)
@@ -55,9 +59,16 @@ let Operations = ({role,connect,env,ipProd})=>{
     let resetForm =()=>{
         setForm({client:'',payer_espece:"0",payer_cheque:'0',payer_credit:'0'})
     } 
+    let resetInputClient = ()=>{
+        setFormClient({firstname:'',lastname:'',adress:'',company:'',ice:''})
+    }
     let handleChange = (event)=>{
         let {name,value} = event.target
         setForm({...forms,[name]:value});
+    }
+    let handleChangeClient = (event)=>{
+        let {name,value} = event.target
+        setFormClient({...formsClient,[name]:value});
     }
     let handlePanier=(id,id_show)=>{
         navigate(`/formcart`,{state:{id:id,id_show:id_show}})
@@ -114,10 +125,32 @@ let Operations = ({role,connect,env,ipProd})=>{
         let data = qs.stringify({...forms,client:clientToAdd,userInfo:userInfo})
  
         axios.post(`${baseUrlToUse}/operations/add`,data).then((response)=>{
+            let newCmdToRedirect ={id:response.data.operation_id,id_show:response.data.operation_id_show}
+            console.log(newCmdToRedirect)
+            setCmdToRedirect(newCmdToRedirect)
             resetForm()
             setErrorMsg(response.data.message)
             getOperations()
+            setShow2(true)
         }) 
+    }
+    let handleSubmitClient =(event)=>{
+        event.preventDefault()
+        setFormClient({...formsClient})
+        for (let index = 0; index < Object.keys(formsClient).length; index++) {
+            let inputName =Object.keys(formsClient)[index]
+            console.log(inputName)
+            if(formsClient[inputName].length==0 && (inputName=="firstname"||inputName=="lastname")){
+                return  setErrorMsgClient(`Veuillez saisir un ${labelClient[inputName]}`)
+            }
+        }
+        let data = qs.stringify(formsClient)
+        axios.post(`${baseUrlToUse}/clients/add`,data).then((response)=>{
+            resetInputClient()
+            setErrorMsgClient(response.data.message)
+            getClients()
+            handleCancelAddClient()
+        })
     }
     useEffect(()=>{
         getOperations()
@@ -129,6 +162,12 @@ let Operations = ({role,connect,env,ipProd})=>{
         },3000)
         return () => clearTimeout(t);
     },[errorMsg])
+    useEffect(()=>{
+        let t = setTimeout(()=>{
+            setErrorMsgClient('')
+        },3000)
+        return () => clearTimeout(t);
+    },[errorMsgClient])
     useEffect(()=>{
         if(localStorage.getItem("user")!==null){
             const userInfo = JSON.parse(JSON.parse(localStorage.getItem("user")))
@@ -155,10 +194,12 @@ let Operations = ({role,connect,env,ipProd})=>{
     },[operations])
     const [show, setShow] = useState(false);
     const [show1, setShow1] = useState(false);
+    const [show2, setShow2] = useState(false);
     const [idToDelete, setIdToDelete] = useState(0);
   const handleClose = () => {
       setShow(false)
       setShow1(false)
+      setShow2(false)
     };
   const handleShow =(id)=> {
       console.log(id)
@@ -236,6 +277,12 @@ let Operations = ({role,connect,env,ipProd})=>{
         SetTVA(value);
         
     }
+    let handleChangeClientMode=()=>{
+        setMode('addClient')
+    }
+    let handleCancelAddClient=()=>{
+        setMode('add')
+    }
 return(
        
         <> 
@@ -282,23 +329,77 @@ return(
         </Modal.Footer>
       </Modal>
     </>
+    <Modal show={show2} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Redirection</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Souhaitez vous ajouter des articles à la commande ?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={()=>{
+              handlePanier(cmdToRedirect.id,cmdToRedirect.id_show)
+              setShow2(false);
+            
+              }}>
+            Aller dans le panier de la commande
+          </Button>
+          <Button variant="danger" onClick={handleClose}>
+            Rester sur la page
+          </Button>
+        </Modal.Footer>
+      </Modal>
         <>
         {(role=="admin") && 
             <h1 className="mb-3">Bénéfice actuel : {benefice.actuel} / Bénéfice previsionnel : {benefice.previsionnel}</h1>
         }
         
         </>
-        {(role =="admin"||role=="livreur") &&
+        {(role =="admin"||role=="livreur") && mode==="addClient" &&
+        <form onSubmit={handleSubmitClient} className="mb-3">
+            <div className="form-group">
+                <label htmlFor="username">{labelClient.firstname}</label>
+                <input type="text" onChange={handleChangeClient} value={formsClient.firstname} className="form-control" id="firstname" name="firstname" aria-describedby="firstname"  />
+            </div>
+            <div className="form-group">
+                <label htmlFor="password">{labelClient.lastname}</label>
+                <input type="text" onChange={handleChangeClient} value={formsClient.lastname} className="form-control" id="lastname" name="lastname" aria-describedby="lastname"  />
+            </div>
+            <div className="form-group">
+                <label htmlFor="email">{labelClient.adress}</label>
+                <input type="text" onChange={handleChangeClient} value={formsClient.adress} className="form-control" id="adress" name="adress" aria-describedby="adress"  />
+            </div>
+            <div className="form-group">
+                <label htmlFor="Année">{labelClient.company}</label>
+                <input type="text"  onChange={handleChangeClient} value={formsClient.company} className="form-control" id="company" name="company" aria-describedby="company" />
+            </div>
+            <div className="form-group">
+                <label htmlFor="ice">{labelClient.ice}</label>
+                <input type="text"  onChange={handleChangeClient} value={formsClient.ice} className="form-control" id="ice" name="ice" aria-describedby="ice" />
+            </div>
+            
+            <div className="mt-2">
+                <p className="text-danger">{errorMsgClient}</p>
+            </div>
+            <div>
+            {mode==="addClient" && <button type="submit" className="m-3 btn btn-success ">Ajouter un client</button>}
+            {mode==="addClient" && <button type="button" onClick={handleCancelAddClient} className="m-3 btn btn-danger ">Annuler</button>}
+            </div>
+        </form>}
+        {(role =="admin"||role=="livreur") && mode!=="addClient" &&
         
         <form onSubmit={handleSubmit} className="mb-3">
                 <div className="form-group">
                     <label htmlFor="titre">{label.client}</label>
-                    <select type="text" onChange={handleChange} value={forms.client} className="form-control" id="designation" name="client" aria-describedby="client">
-                    <option key={0} value="">Selectionnez un client</option>
-                    {clients.map((client,index)=>{
-                        return <option key={index+1} value={client._id}>{client.firstname} , {client.lastname} , {client.company}</option>
-                    })}
-                    </select>
+                    <div className="input-group mb-3">
+                        <select type="text" onChange={handleChange} value={forms.client} className="form-control" id="designation" name="client" aria-describedby="client">
+                        <option key={0} value="">Selectionnez un client</option>
+                        {clients.map((client,index)=>{
+                            return <option key={index+1} value={client._id}>{client.firstname} , {client.lastname} , {client.company}</option>
+                        })}
+                        </select>
+                        <div className="input-group-append">
+                            <button className="btn btn-outline-secondary" onClick={handleChangeClientMode} type="button">Créer un client</button>
+                        </div>
+                    </div>
                 </div>
                 <div className={role=="admin"||role=="livreur"?"form-group":"d-none"}>
                     <label htmlFor="payer_espece">{label.payer_espece}</label>
